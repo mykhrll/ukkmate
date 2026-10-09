@@ -5,6 +5,10 @@ import 'package:ukkmate/features/home/widgets/menu_card.dart';
 import 'package:ukkmate/features/home/widgets/stats_card.dart';
 import 'package:ukkmate/features/home/widgets/competency_card.dart';
 import 'package:ukkmate/features/exam/exam_session_screen.dart';
+import 'package:ukkmate/features/latihan/latihan_screen.dart';
+import 'package:ukkmate/features/tugas/tugas_screen.dart';
+import 'package:ukkmate/features/materi/materi_screen.dart';
+import 'package:ukkmate/features/bantuan/bantuan_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -23,7 +27,7 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 32),
               _buildHeroCard(context),
               const SizedBox(height: 32),
-              _buildMenuGrid(),
+              _buildMenuGrid(context),
               const SizedBox(height: 32),
               const StatsCard(),
               const SizedBox(height: 32),
@@ -44,7 +48,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             const CircleAvatar(
               radius: 24,
-              backgroundImage: AssetImage('assets/logo.jpeg'),
+              backgroundImage: AssetImage('assets/pp_default_laki-laki.jpg'),
             ),
             const SizedBox(width: 16),
             Column(
@@ -163,7 +167,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuGrid() {
+  Widget _buildMenuGrid(BuildContext context) {
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -176,25 +180,33 @@ class HomeScreen extends StatelessWidget {
           title: 'Latihan\nMandiri',
           icon: Icons.edit_note,
           color: AppColors.warningOrange,
-          onTap: () {},
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const LatihanScreen()));
+          },
         ),
         MenuCard(
-          title: 'Bank\nSoal',
-          icon: Icons.storage,
+          title: 'Tugas\n& PR',
+          icon: Icons.assignment,
           color: AppColors.primaryBlue,
-          onTap: () {},
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const TugasScreen()));
+          },
         ),
         MenuCard(
           title: 'Materi &\nModul',
           icon: Icons.menu_book,
           color: AppColors.primaryGreen,
-          onTap: () {},
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const MateriScreen()));
+          },
         ),
         MenuCard(
-          title: 'Jadwal\nUjian',
-          icon: Icons.calendar_month,
+          title: 'Pusat\nBantuan',
+          icon: Icons.help_outline,
           color: Colors.purple,
-          onTap: () {},
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const BantuanScreen()));
+          },
         ),
       ],
     );

@@ -39,6 +39,12 @@ class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
+  static TextStyle bodyText = GoogleFonts.inter(
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    color: AppColors.textPrimary,
+  );
+
   static TextStyle bodyText2 = GoogleFonts.inter(
     fontSize: 12,
     fontWeight: FontWeight.normal,

@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryBlue),
+        scaffoldBackgroundColor: AppColors.backgroundLight,
         useMaterial3: true,
         textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
       ),
