@@ -5,19 +5,67 @@
 **Nama Mahasiswa:** Muhamad Khoirul Ramadhan  
 **NPM:** 2413025012  
 **Program Studi:** Pendidikan Teknologi Informasi  
-**Judul Aplikasi:** UKKMate (Aplikasi Pendamping & Uji Kompetensi Keahlian SMK Berbasis Offline-First)  
+**Judul Aplikasi:** UKKMate: Aplikasi Simulasi dan Bank Soal Uji Kompetensi Keahlian untuk Siswa SMK  
 **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
 
 ## 1. Daftar Alat Kecerdasan Buatan (AI Tools)
-Dalam pengembangan prototipe aplikasi UKKMate hingga pekan UTS, alat bantu AI yang digunakan adalah:
-1. **GitHub Copilot (VS Code Extension):** Digunakan untuk autocompletion kode, boilerplate layout widget Flutter, serta sintaks pemodelan data.
-2. **Google Antigravity / Gemini:** Digunakan sebagai *collaborative coding partner* dalam mendesain antarmuka responsif sesuai mockup UI, analisis statis kode (*static analysis*), serta refactoring navigasi antarlayar.
+Dalam pengembangan prototipe aplikasi UKKMate sejak awal pertemuan hingga pekan UTS, alat bantu AI yang digunakan adalah:
+1. **GitHub Copilot (VS Code Extension):** Digunakan untuk autocompletion kode, pembuatan boilerplate layout widget Flutter, serta penulisan sintaks model data awal.
+2. **Google Antigravity / Gemini:** Digunakan sebagai *collaborative coding partner* dalam mendesain antarmuka responsif sesuai mockup UI, analisis statis kode (*static analysis*), refactoring navigasi antarlayar, dan penegakan *clean code*.
 
 ---
 
-## 2. Pembagian Peran (Human vs AI Contribution)
+## 2. Linimasa & Riwayat Progres Pengembangan Mingguan (5 Minggu Menuju UTS)
+
+Progres pengerjaan aplikasi dibangun secara bertahap dan terencana per minggu sebagai berikut:
+
+### 📅 Minggu 1: Inisiasi Proyek, Desain Sistem, & Autentikasi Terpadu
+- **Fokus Utama:** Inisialisasi struktur proyek Flutter, konfigurasi dependensi (`pubspec.yaml`), dan pembuatan pondasi antarmuka.
+- **Implementasi:**
+  - Setup dependensi `google_fonts`, `percent_indicator`, dan `cupertino_icons`.
+  - Pembuatan *Design System* awal: konstanta warna tema (`AppColors`), tipografi (`AppTextStyles`), dan custom widget dasar.
+  - Implementasi **Minimalist Splash Screen** (`splash_screen.dart`) dengan integrasi logo aplikasi.
+  - Implementasi **Login Terpadu** (`login_screen.dart`) untuk autentikasi NISN siswa dan NIP guru.
+  - Implementasi **Pendaftaran Akun Baru** (`register_screen.dart`) lengkap dengan validasi form dan seleksi jenis kelamin.
+
+### 📅 Minggu 2: Fitur Utama Siswa (Dashboard & Modul Pembelajaran)
+- **Fokus Utama:** Menyediakan antarmuka utama pembelajaran mandiri bagi peserta didik kejuruan.
+- **Implementasi:**
+  - Implementasi **Dashboard Utama Siswa** (`home_screen.dart`) yang memuat target kompetensi keahlian, countdown jadwal simulasi UKK, dan ringkasan progres belajar.
+  - Implementasi **Materi & Video Tutorial** (`materi_screen.dart`) yang mengelompokkan modul kejuruan (RPL, TKJ, dll.) serta integrasi tautan video pembelajaran YouTube.
+  - Implementasi **Penugasan Lab** (`tugas_screen.dart`) untuk memantau tugas praktikum dan checklist kesiapan alat uji kompetensi.
+
+### 📅 Minggu 3: Modul Evaluasi & Analitik Capaian (Bank Soal, Riwayat, & Bantuan)
+- **Fokus Utama:** Modul evaluasi kemampuan siswa, pemantauan riwayat nilai, dan layanan bantuan.
+- **Implementasi:**
+  - Implementasi **Katalog Paket Latihan Soal** (`latihan_screen.dart`) dengan filter kompetensi (Mahir, Menengah, Dasar) dan status ketersediaan paket.
+  - Implementasi **Riwayat & Analitik Progres** (`riwayat_screen.dart`) yang memuat grafik statistik nilai, riwayat pengerjaan simulasi CBT, dan status kelulusan standar kompetensi.
+  - Implementasi **Pusat Bantuan & FAQ** (`bantuan_screen.dart`) serta halaman pengaturan akun pengguna (`profile_screen.dart`).
+
+### 📅 Minggu 4: Penguatan Arsitektur Offline-First & Validasi Identitas Siswa
+- **Fokus Utama:** Penyesuaian arsitektur aplikasi untuk kebutuhan lab sekolah yang minim internet dan akurasi data akademik.
+- **Implementasi:**
+  - Perancangan arsitektur *Offline-First caching* agar bank soal dan materi dapat diakses tanpa koneksi internet aktif.
+  - Implementasi **Status Sinkronisasi Offline-First** (`status_sinkronisasi_screen.dart`) dengan visualisasi kapasitas memori lokal, antrean sinkronisasi, toggle auto-sync, dan riwayat sinkronisasi ke server sekolah.
+  - Implementasi **Profil Pengguna & Validasi NISN** (`profil_siswa_screen.dart`) dengan data akademik Dapodik terenkripsi.
+  - Pengalihan avatar default ke foto profil berbasis jenis kelamin (`pp_default_laki-laki.jpg` & `pp_default_perempuan.jpg`) menggantikan ikon logo generic.
+
+### 📅 Minggu 5: Portal Guru Pendamping, Sesi CBT Interaktif, & Refinement UTS
+- **Fokus Utama:** Monitoring asesi oleh guru pembimbing, sesi pengerjaan ujian interaktif, dan optimalisasi kode secara menyeluruh.
+- **Implementasi:**
+  - Implementasi **Latihan Mandiri RPL / Sesi CBT** (`latihan_soal_screen.dart`) dengan fitur pilihan ganda interaktif, diagram arsitektur sistem, toggle detail pembahasan jawaban, timer, dan navigasi nomor soal.
+  - Implementasi **Portal Guru Pendamping - Dashboard** (`guru_dashboard_screen.dart`) memuat *Live Exam Monitor*, statistik siswa remedial vs kompeten, dan aksi cepat guru.
+  - Implementasi **Portal Guru Pendamping - Daftar Asesi** (`guru_daftar_asesi_screen.dart`) untuk manajemen data asesi per rombel (XII RPL 1 & 2), filter kelulusan, dan sinkronisasi Dapodik.
+  - Integrasi navigasi menyeluruh: tombol "Mulai Kerjakan" di Latihan langsung membuka sesi CBT, dan menu profil menyediakan pintasan ke Portal Guru, Profil Siswa, dan Sinkronisasi.
+  - Penyelarasan warna latar aplikasi (`#EFF3FA`) agar selaras dengan palet logo UKKMate (navy & royal blue), menghilangkan kesan putih polos.
+  - Audit kode dengan `flutter analyze` hingga mencapai **0 issues (Zero error, zero warning)**.
+  - Penyusunan berkas kelengkapan UTS: `README.md` dan `AI_DECLARATION.md`.
+
+---
+
+## 3. Pembagian Peran (Human vs AI Contribution)
 
 | Modul / Komponen | Peran Mahasiswa (Manual) | Peran Asisten AI |
 | :--- | :--- | :--- |
@@ -30,7 +78,7 @@ Dalam pengembangan prototipe aplikasi UKKMate hingga pekan UTS, alat bantu AI ya
 
 ---
 
-## 3. Studi Kasus Prompting & Evaluasi Kritis
+## 4. Studi Kasus Prompting & Evaluasi Kritis
 
 ### Studi Kasus 1: Penanganan Ketiadaan `BuildContext` pada Navigasi `StatelessWidget`
 - **Tujuan / Instruksi (Prompt):**  
@@ -56,7 +104,7 @@ Dalam pengembangan prototipe aplikasi UKKMate hingga pekan UTS, alat bantu AI ya
 
 ---
 
-## 4. Rencana Target Fitur Menuju Akhir Semester (UAS)
+## 5. Rencana Target Fitur Menuju Akhir Semester (UAS)
 1. **Integrasi Backend API (RESTful API):** Menghubungkan modul autentikasi NISN/NIP, pengambilan bank soal, dan pengiriman rekap nilai ke server database terpusat.
 2. **Penyimpanan Lokal Persisten (SQLite / Isar / Drift):** Menyempurnakan fitur *Offline-First* agar seluruh riwayat pengerjaan soal dan cache paket materi tersimpan permanen di perangkat lokal mahasiswa saat tidak ada sinyal.
 3. **Fitur Presensi / Validasi QR Code CBT Lab:** Menambahkan scanner kamera untuk memindai kode QR workstation lab komputer saat ujian simulasi UKK berlangsung.

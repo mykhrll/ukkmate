@@ -1,4 +1,4 @@
-# UKKMate - Aplikasi Pendamping Uji Kompetensi Keahlian SMK
+# UKKMate: Aplikasi Simulasi dan Bank Soal Uji Kompetensi Keahlian untuk Siswa SMK
 
 > **Mobile Programming**  
 > **Nama:** Muhamad Khoirul Ramadhan  
