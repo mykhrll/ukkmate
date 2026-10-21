@@ -5,6 +5,9 @@ import 'package:ukkmate/core/widgets/custom_card.dart';
 import 'package:ukkmate/core/widgets/status_badge.dart';
 import 'package:ukkmate/features/auth/login_screen.dart';
 import 'package:ukkmate/features/profile/widgets/settings_item.dart';
+import 'package:ukkmate/features/profile/profil_siswa_screen.dart';
+import 'package:ukkmate/features/sinkronisasi/status_sinkronisasi_screen.dart';
+import 'package:ukkmate/features/guru/guru_dashboard_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -30,7 +33,7 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 32),
             _buildInfoCard(),
             const SizedBox(height: 24),
-            _buildSettingsCard(),
+            _buildSettingsCard(context),
             const SizedBox(height: 24),
             _buildLogoutButton(context),
             const SizedBox(height: 32),
@@ -108,7 +111,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsCard() {
+  Widget _buildSettingsCard(BuildContext context) {
     return CustomCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,9 +123,29 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 16),
           SettingsItem(
             icon: Icons.edit_outlined,
-            title: 'Edit Profil',
-            subtitle: 'Perbarui data diri dan foto profil',
-            onTap: () {},
+            title: 'Edit Profil & Validasi NISN',
+            subtitle: 'Data akademik, identitas, dan validasi',
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilSiswaScreen()));
+            },
+          ),
+          const Divider(height: 16),
+          SettingsItem(
+            icon: Icons.sync,
+            title: 'Status Sinkronisasi',
+            subtitle: 'Data offline & antrean sinkronisasi',
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const StatusSinkronisasiScreen()));
+            },
+          ),
+          const Divider(height: 16),
+          SettingsItem(
+            icon: Icons.dashboard_customize_outlined,
+            title: 'Portal Guru Pendamping',
+            subtitle: 'Dashboard pantauan siswa & rekap CBT',
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const GuruDashboardScreen()));
+            },
           ),
           const Divider(height: 16),
           SettingsItem(
@@ -142,7 +165,7 @@ class ProfileScreen extends StatelessWidget {
           SettingsItem(
             icon: Icons.info_outline,
             title: 'Tentang Aplikasi',
-            subtitle: 'Versi 1.0.0',
+            subtitle: 'Versi 0.0.1',
             onTap: () {},
           ),
         ],

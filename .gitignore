@@ -1,0 +1,72 @@
+# ==========================================
+# Miscellaneous
+# ==========================================
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.history
+.svn/
+migrate_working_dir/
+*.rar
+Flutter.code-workspace
+.vscode/
+ukkmate/
+
+# ==========================================
+# Build artifacts
+# ==========================================
+.build/
+.buildlog/
+build/
+coverage/
+
+# ==========================================
+# JVM crash logs (Gradle)
+# ==========================================
+hs_err_pid*
+replay_pid*
+
+# ==========================================
+# IntelliJ / Android Studio
+# ==========================================
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# ==========================================
+# Flutter / Dart / Pub
+# ==========================================
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Generated API documentation
+**/doc/api/
+
+# Generated iOS build metadata
+**/ios/Flutter/.last_build_id
+
+# ==========================================
+# Flutter application symbols
+# ==========================================
+app.*.symbols
+app.*.map.json
+
+# ==========================================
+# Android build artifacts
+# ==========================================
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+
+# ==========================================
+# Widget Preview
+# ==========================================
+.widget_preview/

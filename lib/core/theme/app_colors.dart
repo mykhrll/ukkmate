@@ -12,8 +12,8 @@ class AppColors {
   static const Color offlineOrange = Color(0xFFF97316);
   
   static const Color cardWhite = Color(0xFFFFFFFF);
-  static const Color backgroundLight = Color(0xFFF9FAFF);
-  static const Color backgroundDark = Color(0xFF161A29); // dari logo bg
+  static const Color backgroundLight = Color(0xFFEFF3FA); // Warna latar selaras dengan logo agar tidak putih polos dan user-friendly
+  static const Color backgroundDark = Color(0xFF161A29); // Dari logo dark navy
 
   static const Color textPrimary = Color(0xFF1A1F36);
   static const Color textSecondary = Color(0xFF6B7280);

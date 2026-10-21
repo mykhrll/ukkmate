@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ukkmate/core/theme/app_colors.dart';
 import 'package:ukkmate/core/theme/app_text_styles.dart';
+import 'package:ukkmate/features/latihan/latihan_soal_screen.dart';
 
 class LatihanScreen extends StatelessWidget {
   const LatihanScreen({super.key});
@@ -30,6 +31,7 @@ class LatihanScreen extends StatelessWidget {
               _buildListHeader(),
               const SizedBox(height: 16),
               _buildPackageCard(
+                context,
                 'Paket A: Pemrograman Web & REST API',
                 'Studi kasus otentikasi JWT, endpoint Express.js, query relasional ORM, dan pengujian API menggunakan Postman.',
                 'RPL',
@@ -44,6 +46,7 @@ class LatihanScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _buildPackageCard(
+                context,
                 'Paket B: Administrasi Server Linux & Nginx',
                 'Konfigurasi Reverse Proxy Nginx, izin berkas chmod/chown, DNS bind9, dan troubleshooting layanan systemctl.',
                 'TKJ',
@@ -58,6 +61,7 @@ class LatihanScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _buildPackageCard(
+                context,
                 'Paket C: Database Relasional SQLite & Normalisasi',
                 'Kaidah bentuk normal 1NF sampai 3NF, sintaks DDL/DML kompleks, indexing primary & foreign key, serta optimasi query.',
                 'RPL',
@@ -72,6 +76,7 @@ class LatihanScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _buildPackageCard(
+                context,
                 'Paket D: Konfigurasi Routing MikroTik & VLAN',
                 'Implementasi OSPF, VLAN Trunking 802.1Q, firewall filter rules, serta skema hotspot captive portal SMK.',
                 'TKJ',
@@ -563,6 +568,7 @@ class LatihanScreen extends StatelessWidget {
   }
 
   Widget _buildPackageCard(
+    BuildContext context,
     String title,
     String desc,
     String badge1,
@@ -747,7 +753,14 @@ class LatihanScreen extends StatelessWidget {
                 )
               else
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LatihanSoalScreen(),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryBlue,
                     foregroundColor: Colors.white,
