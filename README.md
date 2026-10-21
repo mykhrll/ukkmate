@@ -4,6 +4,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
+> **Versi Aplikasi:** v0.0.5 (Rilis UTS)  
 
 ---
 
