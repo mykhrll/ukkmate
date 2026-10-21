@@ -3,7 +3,8 @@
 **Mata Kuliah:** Mobile Programming  
 **Sifat Ujian:** Proyek Mandiri (Ujian Tengah Semester - UTS)  
 **Nama Mahasiswa:** Muhamad Khoirul Ramadhan  
-**NIM:** 2413025012  
+**NPM:** 2413025012  
+**Program Studi:** Pendidikan Teknologi Informasi  
 **Judul Aplikasi:** UKKMate (Aplikasi Pendamping & Uji Kompetensi Keahlian SMK Berbasis Offline-First)  
 **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 

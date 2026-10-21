@@ -1,9 +1,9 @@
 # UKKMate - Aplikasi Pendamping Uji Kompetensi Keahlian SMK
 
-> **Tugas Ujian Tengah Semester (UTS) - Mobile Programming**  
+> **Mobile Programming**  
 > **Nama:** Muhamad Khoirul Ramadhan  
-> **NIM:** 2413025012  
-> **Program Studi / Kelas:** Rekayasa Perangkat Lunak / Teknik Informatika  
+> **NPM:** 2413025012  
+> **Program Studi:** Pendidikan Teknologi Informasi  
 
 ---
 
