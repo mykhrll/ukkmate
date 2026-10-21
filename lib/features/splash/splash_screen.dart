@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'V1.0 • SMK BISA',
+                  'v0.0.5 • SMK BISA',
                   style: AppTextStyles.caption.copyWith(letterSpacing: 1.5),
                 ),
               ],
