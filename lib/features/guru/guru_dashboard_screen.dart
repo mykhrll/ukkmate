@@ -5,7 +5,8 @@ import 'package:ukkmate/features/guru/guru_daftar_asesi_screen.dart';
 import 'package:ukkmate/features/guru/guru_bank_soal_screen.dart';
 
 class GuruDashboardScreen extends StatelessWidget {
-  const GuruDashboardScreen({super.key});
+  final bool embedded;
+  const GuruDashboardScreen({super.key, this.embedded = false});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,7 @@ class GuruDashboardScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(context),
+      bottomNavigationBar: embedded ? null : _buildBottomNav(context),
     );
   }
 
@@ -40,12 +41,13 @@ class GuruDashboardScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
-            onPressed: () => Navigator.pop(context),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
+          if (!embedded)
+            IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
+              onPressed: () => Navigator.pop(context),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
           const SizedBox(width: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(8),

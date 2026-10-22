@@ -5,7 +5,8 @@ import 'package:ukkmate/features/guru/guru_bank_soal_screen.dart';
 import 'package:ukkmate/features/guru/guru_dashboard_screen.dart';
 
 class GuruDaftarAsesiScreen extends StatelessWidget {
-  const GuruDaftarAsesiScreen({super.key});
+  final bool embedded;
+  const GuruDaftarAsesiScreen({super.key, this.embedded = false});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,7 @@ class GuruDaftarAsesiScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(context),
+      bottomNavigationBar: embedded ? null : _buildBottomNav(context),
     );
   }
 
@@ -48,12 +49,13 @@ class GuruDaftarAsesiScreen extends StatelessWidget {
       decoration: const BoxDecoration(color: AppColors.backgroundDark),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
-            onPressed: () => Navigator.pop(context),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
+          if (!embedded)
+            IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
+              onPressed: () => Navigator.pop(context),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
           const SizedBox(width: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(8),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ukkmate/core/theme/app_colors.dart';
 import 'package:ukkmate/core/theme/app_text_styles.dart';
+import 'package:ukkmate/core/widgets/floating_chat_button.dart';
 import 'package:ukkmate/features/home/home_screen.dart';
 import 'package:ukkmate/features/latihan/latihan_screen.dart';
 import 'package:ukkmate/features/riwayat/riwayat_screen.dart';
@@ -49,6 +50,7 @@ class _MainNavigationState extends State<MainNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
+      floatingActionButton: const FloatingChatButton(),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -103,3 +105,4 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 }
+

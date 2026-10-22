@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ukkmate/core/theme/app_colors.dart';
 import 'package:ukkmate/core/theme/app_text_styles.dart';
-import 'package:ukkmate/features/guru/guru_dashboard_screen.dart';
+import 'package:ukkmate/features/guru/guru_navigation.dart';
 import 'package:ukkmate/features/navigation/main_navigation.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -613,7 +613,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const GuruDashboardScreen(),
+                            builder: (_) => const GuruNavigation(initialIndex: 2),
                 ),
               );
             },
@@ -1271,7 +1271,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const GuruDashboardScreen(),
+                                      builder: (_) => const GuruNavigation(initialIndex: 2),
                           ),
                         );
                       },

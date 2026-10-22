@@ -7,7 +7,7 @@ import 'package:ukkmate/features/auth/login_screen.dart';
 import 'package:ukkmate/features/profile/widgets/settings_item.dart';
 import 'package:ukkmate/features/profile/profil_siswa_screen.dart';
 import 'package:ukkmate/features/sinkronisasi/status_sinkronisasi_screen.dart';
-import 'package:ukkmate/features/guru/guru_dashboard_screen.dart';
+
 import 'package:ukkmate/features/bantuan/bantuan_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -139,15 +139,7 @@ class ProfileScreen extends StatelessWidget {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const StatusSinkronisasiScreen()));
             },
           ),
-          const Divider(height: 16),
-          SettingsItem(
-            icon: Icons.dashboard_customize_outlined,
-            title: 'Portal Guru Pendamping',
-            subtitle: 'Dashboard pantauan siswa & rekap CBT',
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const GuruDashboardScreen()));
-            },
-          ),
+
           const Divider(height: 16),
           SettingsItem(
             icon: Icons.lock_outline,

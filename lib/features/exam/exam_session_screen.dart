@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ukkmate/core/theme/app_colors.dart';
 import 'package:ukkmate/core/theme/app_text_styles.dart';
 import 'package:ukkmate/features/exam/exam_result_screen.dart';
@@ -17,29 +18,71 @@ class _ExamSessionScreenState extends State<ExamSessionScreen> {
   final int _totalQuestions = 40;
 
   @override
+  void initState() {
+    super.initState();
+    // Enable FLAG_SECURE to prevent screenshots and screen recording
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    _enableSecureMode();
+  }
+
+  @override
+  void dispose() {
+    // Disable FLAG_SECURE when leaving exam
+    _disableSecureMode();
+    super.dispose();
+  }
+
+  /// Enables secure mode to prevent screenshots (Android FLAG_SECURE).
+  void _enableSecureMode() {
+    // On Android, this sets FLAG_SECURE on the window
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+      ),
+    );
+    // Use platform channel to set FLAG_SECURE
+    const platform = MethodChannel('com.ukkmate/security');
+    platform.invokeMethod('enableSecureMode').catchError((_) {
+      // Silently handle if platform channel is not available
+    });
+  }
+
+  /// Disables secure mode when exam is complete.
+  void _disableSecureMode() {
+    const platform = MethodChannel('com.ukkmate/security');
+    platform.invokeMethod('disableSecureMode').catchError((_) {
+      // Silently handle if platform channel is not available
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: _buildAppBar(),
+      // No floatingActionButton here - chat is hidden during exams
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildProgressIndicator(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildQuestionCard(),
-                    const SizedBox(height: 24),
-                    _buildOptions(),
-                  ],
+        // Wrap entire body in SelectionArea.disabled to prevent text copying
+        child: SelectionContainer.disabled(
+          child: Column(
+            children: [
+              _buildProgressIndicator(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildQuestionCard(),
+                      const SizedBox(height: 24),
+                      _buildOptions(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            _buildBottomNavigation(),
-          ],
+              _buildBottomNavigation(),
+            ],
+          ),
         ),
       ),
     );
