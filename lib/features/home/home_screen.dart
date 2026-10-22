@@ -5,13 +5,15 @@ import 'package:ukkmate/features/home/widgets/menu_card.dart';
 import 'package:ukkmate/features/home/widgets/stats_card.dart';
 import 'package:ukkmate/features/home/widgets/competency_card.dart';
 import 'package:ukkmate/features/exam/exam_session_screen.dart';
-import 'package:ukkmate/features/latihan/latihan_screen.dart';
 import 'package:ukkmate/features/tugas/tugas_screen.dart';
 import 'package:ukkmate/features/materi/materi_screen.dart';
 import 'package:ukkmate/features/bantuan/bantuan_screen.dart';
+import 'package:ukkmate/features/navigation/main_navigation.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final void Function(int index)? onNavigateTab;
+
+  const HomeScreen({super.key, this.onNavigateTab});
 
   @override
   Widget build(BuildContext context) {
@@ -181,7 +183,11 @@ class HomeScreen extends StatelessWidget {
           icon: Icons.edit_note,
           color: AppColors.warningOrange,
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const LatihanScreen()));
+            if (onNavigateTab != null) {
+              onNavigateTab!(1);
+            } else {
+              MainNavigation.switchTab(context, 1);
+            }
           },
         ),
         MenuCard(
