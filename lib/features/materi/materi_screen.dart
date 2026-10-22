@@ -15,7 +15,7 @@ class MateriScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
+              _buildHeader(context),
               const SizedBox(height: 24),
               _buildProgressCard(),
               const SizedBox(height: 24),
@@ -59,19 +59,27 @@ class MateriScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppColors.backgroundDark,
-                borderRadius: BorderRadius.circular(8),
+            IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+              onPressed: () => Navigator.pop(context),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+            const SizedBox(width: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/logo.jpeg',
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
               ),
-              child: const Icon(Icons.menu_book, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 12),
             Column(

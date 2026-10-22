@@ -104,13 +104,14 @@ class LatihanScreen extends StatelessWidget {
       children: [
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppColors.backgroundDark,
-                borderRadius: BorderRadius.circular(8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/logo.jpeg',
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
               ),
-              child: const Icon(Icons.school, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 12),
             Column(

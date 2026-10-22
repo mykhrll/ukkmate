@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ukkmate/core/theme/app_colors.dart';
 import 'package:ukkmate/core/theme/app_text_styles.dart';
 import 'package:ukkmate/features/guru/guru_daftar_asesi_screen.dart';
+import 'package:ukkmate/features/guru/guru_bank_soal_screen.dart';
 
 class GuruDashboardScreen extends StatelessWidget {
   const GuruDashboardScreen({super.key});
@@ -15,7 +16,7 @@ class GuruDashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
+              _buildHeader(context),
               _buildTeacherInfo(),
               _buildFilterSection(),
               _buildProgressSection(),
@@ -31,21 +32,29 @@ class GuruDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+      padding: const EdgeInsets.fromLTRB(16, 16, 20, 12),
       decoration: const BoxDecoration(
         color: AppColors.backgroundDark,
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(8),
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
+            onPressed: () => Navigator.pop(context),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+          const SizedBox(width: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              'assets/logo.jpeg',
+              width: 28,
+              height: 28,
+              fit: BoxFit.cover,
             ),
-            child: Image.asset('assets/logo.jpeg', width: 24, height: 24, errorBuilder: (_, __, ___) => const Icon(Icons.school, color: Colors.white, size: 24)),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -767,9 +776,14 @@ class GuruDashboardScreen extends StatelessWidget {
         unselectedLabelStyle: AppTextStyles.caption.copyWith(fontSize: 10),
         onTap: (index) {
           if (index == 0) {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const GuruDaftarAsesiScreen()),
+            );
+          } else if (index == 1) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const GuruBankSoalScreen()),
             );
           }
         },

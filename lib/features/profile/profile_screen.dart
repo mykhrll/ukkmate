@@ -8,6 +8,7 @@ import 'package:ukkmate/features/profile/widgets/settings_item.dart';
 import 'package:ukkmate/features/profile/profil_siswa_screen.dart';
 import 'package:ukkmate/features/sinkronisasi/status_sinkronisasi_screen.dart';
 import 'package:ukkmate/features/guru/guru_dashboard_screen.dart';
+import 'package:ukkmate/features/bantuan/bantuan_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -159,7 +160,9 @@ class ProfileScreen extends StatelessWidget {
             icon: Icons.help_outline,
             title: 'Pusat Bantuan',
             subtitle: 'FAQ dan hubungi dukungan',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const BantuanScreen()));
+            },
           ),
           const Divider(height: 16),
           SettingsItem(

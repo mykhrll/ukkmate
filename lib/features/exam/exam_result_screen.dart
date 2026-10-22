@@ -27,8 +27,16 @@ class ExamResultScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text('Hasil Ujian', style: AppTextStyles.headline3),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const MainNavigation()),
+              (route) => false,
+            );
+          },
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
