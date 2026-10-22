@@ -160,7 +160,7 @@ class ProfileScreen extends StatelessWidget {
           SettingsItem(
             icon: Icons.info_outline,
             title: 'Tentang Aplikasi',
-            subtitle: 'Versi 0.0.5',
+            subtitle: 'Versi 0.1.0',
             onTap: () {},
           ),
         ],

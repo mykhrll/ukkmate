@@ -4,7 +4,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.0.5 (Rilis UTS)  
+> **Versi Aplikasi:** v0.1.0 (Rilis UTS)  
 
 ---
 
@@ -41,6 +41,15 @@ Aplikasi ini mengusung pendekatan **Offline-First**, memungkinkan siswa berlatih
    - Dashboard pemantauan ujian langsung (*Live Exam Monitor*).
    - Analisis statistik siswa remedial vs siswa kompeten.
    - Manajemen asesi per rombongan belajar (Rombel XII RPL 1 & 2).
+   - Navigasi smooth antar tab dengan transisi animasi (tanpa page-jump).
+
+6. **Floating AI Chatbot (Coming Soon):**
+   - Tombol chat AI assistant tersedia di seluruh halaman siswa dan guru.
+   - Otomatis tersembunyi saat sesi ujian aktif berlangsung.
+
+7. **Keamanan Ujian:**
+   - Pencegahan screenshot dan screen recording saat ujian (FLAG_SECURE).
+   - Blokir copy-paste teks soal ujian (SelectionContainer.disabled).
 
 ---
 
@@ -66,7 +75,7 @@ lib/
 │   ├── theme/                  # Desain sistem & konstanta warna tema
 │   │   ├── app_colors.dart     # Brand identity (Navy, Royal Blue, Green, Orange)
 │   │   └── app_text_styles.dart# Standar tipografi Inter
-│   └── widgets/                # Komponen UI global (Card, Button, Badge)
+│   └── widgets/                # Komponen UI global (Card, Button, Badge, FloatingChatButton)
 │
 ├── features/                   # Modul fitur fungsional
 │   ├── auth/                   # Autentikasi NISN/NIP & Pendaftaran Akun
@@ -75,9 +84,11 @@ lib/
 │   ├── materi/                 # Modul kejuruan & tutorial
 │   ├── tugas/                  # Penugasan lab praktikum
 │   ├── riwayat/                # Analitik progres nilai
+│   ├── exam/                   # Sesi ujian CBT & hasil ujian (dengan keamanan)
 │   ├── sinkronisasi/           # StatusSinkronisasiScreen (Offline engine)
 │   ├── profile/                # ProfileScreen & ProfilSiswaScreen (Dapodik data)
-│   └── guru/                   # GuruDashboardScreen & GuruDaftarAsesiScreen
+│   ├── navigation/             # MainNavigation (Bottom Nav Shell siswa)
+│   └── guru/                   # GuruNavigation, Dashboard, DaftarAsesi, BankSoal
 │
 └── main.dart                   # Entry point aplikasi & konfigurasi tema
 ```

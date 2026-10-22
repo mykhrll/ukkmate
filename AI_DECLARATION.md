@@ -17,7 +17,7 @@ Dalam pengembangan prototipe aplikasi UKKMate sejak awal pertemuan hingga pekan 
 
 ---
 
-## 2. Linimasa, Versi Rilis, & Riwayat Progres Mingguan (5 Minggu Menuju UTS)
+## 2. Linimasa, Versi Rilis, & Riwayat Progres Mingguan (6 Minggu Menuju UTS)
 
 Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terencana dengan penomoran versi berkala:
 
@@ -25,7 +25,8 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | :--- | :--- | :--- |
 | **v0.0.1** | Minggu 1 – 2 | Inisiasi proyek Flutter, *design system*, autentikasi NISN/NIP, modul materi, tugas lab, dan dashboard siswa. |
 | **v0.0.3** | Minggu 3 – 4 | Katalog bank soal bertingkat, riwayat & analitik capaian kompetensi, arsitektur *Offline-First caching*, serta validasi profil Dapodik. |
-| **v0.0.5 (UTS)** | Minggu 5 | Sesi ujian CBT interaktif (`LatihanSoalScreen`), Portal Guru Pendamping (Dashboard & Daftar Asesi), penyelarasan warna tema logo, dan finalisasi berkas UTS. |
+| **v0.0.5** | Minggu 5 | Sesi ujian CBT interaktif (`LatihanSoalScreen`), Portal Guru Pendamping (Dashboard & Daftar Asesi), penyelarasan warna tema logo, dan finalisasi berkas UTS. |
+| **v0.1.0 (UTS)** | Minggu 6 | Smooth navigation guru, floating AI chatbot, keamanan ujian (anti-screenshot & anti-copy), Bank Soal guru, dan penyempurnaan UI sesuai mockup Figma. |
 
 ---
 
@@ -52,7 +53,7 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   - Implementasi **Profil Pengguna & Validasi NISN** (`profil_siswa_screen.dart`) dengan data akademik Dapodik terenkripsi.
   - Pengalihan avatar default ke foto profil berbasis jenis kelamin (`pp_default_laki-laki.jpg` & `pp_default_perempuan.jpg`) menggantikan ikon generic.
 
-### 📅 Minggu 5 (Rilis v0.0.5 — Versi UTS): Portal Guru Pendamping, Sesi CBT Interaktif, & Finalisasi UTS
+### 📅 Minggu 5 (Rilis v0.0.5): Portal Guru Pendamping, Sesi CBT Interaktif, & Finalisasi Awal
 - **Fokus Utama:** Monitoring asesi oleh guru pembimbing, sesi pengerjaan ujian interaktif, penyesuaian tema warna logo, dan kepatuhan standar UTS.
 - **Implementasi:**
   - Peningkatan versi aplikasi di `pubspec.yaml` dan tampilan profil menjadi **v0.0.5**.
@@ -64,6 +65,24 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   - Audit kode dengan `flutter analyze` hingga mencapai **0 issues (Zero error, zero warning)**.
   - Penyusunan berkas kelengkapan UTS: `README.md` dan `AI_DECLARATION.md`.
 
+### 📅 Minggu 6 (Rilis v0.1.0 — Versi UTS Final): Smooth Navigation, AI Chatbot, & Keamanan Ujian
+- **Fokus Utama:** Penyempurnaan UX navigasi guru, penambahan fitur AI chatbot, implementasi keamanan ujian, dan penyelarasan UI dengan mockup Figma.
+- **Implementasi:**
+  - Peningkatan versi aplikasi menjadi **v0.1.0** di `pubspec.yaml`, splash screen, dan profil.
+  - Implementasi **Smooth Login/Register** (`login_screen.dart`) — unified screen dengan `AnimatedCrossFade` dan animated indicator pill, tidak lagi pindah halaman.
+  - Penggantian logo placeholder ke logo resmi UKKMate (`assets/logo.jpeg`) di seluruh header siswa dan guru.
+  - Penambahan tombol kembali (`arrow_back`) pada seluruh sub-menu yang tidak ada di bottom navigation bar.
+  - Fix navigasi **Latihan Mandiri** dari beranda agar tetap mempertahankan bottom navigation bar.
+  - Penghapusan menu **Portal Guru Pendamping** dari profil siswa (karena merupakan fitur login guru, bukan siswa).
+  - Implementasi **GuruNavigation** (`guru_navigation.dart`) — shell navigasi terpusat untuk portal guru dengan transisi `AnimatedSwitcher` (fade smooth), menggantikan `Navigator.pushReplacement` yang menyebabkan efek lompat halaman.
+  - Penambahan parameter `embedded` pada `GuruDashboardScreen`, `GuruDaftarAsesiScreen`, dan `GuruBankSoalScreen` untuk menghilangkan bottom nav duplikat saat di-host dalam shell.
+  - Implementasi **Floating AI Chatbot** (`floating_chat_button.dart`) — tombol FAB animasi yang tersedia di seluruh layar siswa (`MainNavigation`) dan guru (`GuruNavigation`).
+  - **Keamanan Ujian:** Chatbot otomatis tersembunyi saat sesi ujian aktif.
+  - **Anti-Screenshot:** Implementasi `FLAG_SECURE` via platform channel (`MainActivity.kt`) untuk mencegah screenshot dan screen recording selama ujian.
+  - **Anti-Copy:** Pembungkusan konten ujian dengan `SelectionContainer.disabled` untuk mencegah penyalinan teks soal.
+  - Implementasi **Bank Soal Guru** (`guru_bank_soal_screen.dart`) — manajemen paket soal dengan distribusi lab, rubrik penilaian, dan konfigurasi timer.
+  - Audit kode dengan `flutter analyze` hingga mencapai **0 issues (Zero error, zero warning)**.
+
 ---
 
 ## 3. Pembagian Peran (Human vs AI Contribution)
@@ -72,8 +91,11 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | :--- | :--- | :--- |
 | **Arsitektur Proyek & Folder Structure** | Menentukan arsitektur berbasis fitur (*feature-first* / layered architecture: `core`, `features`, `widgets`), memilih package dependency. | Merekomendasikan struktur hirarki file standar Flutter. |
 | **Desain Sistem & Brand Identity** | Menentukan palet warna dari logo utama (`#161A29`, `#135CE2`, `#23B26D`, `#F99E15`), menolak latar putih polos dan meminta latar *soft slate-blue* (`#EFF3FA`). | Mengenerate kelas konstanta warna (`AppColors`) dan `AppTextStyles`. |
+| **Mockup UI Figma** | Merancang seluruh mockup UI di Figma, menentukan layout, spacing, warna, dan flow navigasi antar-screen. | Mengimplementasikan desain dari referensi mockup ke kode Flutter. |
 | **Latihan Mandiri & Simulasi CBT** | Merancang logika interaktif seleksi opsi jawaban (A/B/C/D), alur navigasi soal, dan mekanisme toggle penjelasan jawaban. | Membantu penyusunan widget visual soal, opsi radio card, dan progress bar timer. |
 | **Portal Guru & Pantauan Siswa** | Menentukan kebutuhan data pantauan (status kompeten, indikator remedial, Live Monitor ujian, dan sinkronisasi Dapodik). | Menghasilkan struktur card analitik dan listview asesi. |
+| **Smooth Navigation & UX** | Mengarahkan bahwa navigasi harus smooth (tidak boleh lompat halaman), menentukan penggunaan tab-based shell. | Mengimplementasikan `AnimatedSwitcher`, `AnimatedCrossFade`, dan `GuruNavigation` shell. |
+| **Keamanan Ujian** | Menentukan requirement anti-screenshot, anti-copy, dan auto-hide chatbot saat ujian. | Mengimplementasikan `FLAG_SECURE` via platform channel dan `SelectionContainer.disabled`. |
 | **Validasi & Foto Profil Berbasis Gender** | Mengarahkan integrasi aset foto profil default sesuai jenis kelamin (`pp_default_laki-laki.jpg` & `pp_default_perempuan.jpg`) menggantikan placeholder icon/logo. | Menyesuaikan binding `AssetImage` pada `CircleAvatar`. |
 | **Debugging & Quality Assurance** | Menguji fungsionalitas, mengevaluasi lint issue dengan `flutter analyze`, serta memastikan zero error & zero warning. | Memberikan saran perbaikan konstanta (`const`) dan pembersihan *unused fields*. |
 
@@ -109,3 +131,4 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 1. **Integrasi Backend API (RESTful API):** Menghubungkan modul autentikasi NISN/NIP, pengambilan bank soal, dan pengiriman rekap nilai ke server database terpusat.
 2. **Penyimpanan Lokal Persisten (SQLite / Isar / Drift):** Menyempurnakan fitur *Offline-First* agar seluruh riwayat pengerjaan soal dan cache paket materi tersimpan permanen di perangkat lokal mahasiswa saat tidak ada sinyal.
 3. **Fitur Presensi / Validasi QR Code CBT Lab:** Menambahkan scanner kamera untuk memindai kode QR workstation lab komputer saat ujian simulasi UKK berlangsung.
+4. **AI Chatbot Integration:** Mengimplementasikan fungsionalitas chatbot AI yang telah di-scaffold pada v0.1.0 untuk membantu siswa belajar dan menjawab pertanyaan terkait materi UKK.
