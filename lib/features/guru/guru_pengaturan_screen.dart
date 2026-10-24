@@ -458,7 +458,7 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
           ListTile(
             leading: const Icon(Icons.info_outline, color: AppColors.textSecondary),
             title: Text('Tentang UKKMate Guru', style: AppTextStyles.bodyText1),
-            subtitle: Text('Versi 0.1.5 • Standar BNSP & Dapodik', style: AppTextStyles.caption),
+            subtitle: Text('Versi 0.1.6 • Standar BNSP & Dapodik', style: AppTextStyles.caption),
             trailing: const Icon(Icons.arrow_forward_ios, size: 14),
             onTap: () {},
           ),
