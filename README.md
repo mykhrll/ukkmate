@@ -16,7 +16,7 @@ Aplikasi ini mengusung pendekatan **Offline-First**, memungkinkan siswa berlatih
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 - Progres 5)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 & v0.1.6)
 
 1. **Video Splash Screen Interaktif (3–5 Detik):**
    - Menampilkan animasi video splash screen beresolusi tinggi (`assets/splash-screen.mp4`).
@@ -60,6 +60,11 @@ Aplikasi ini mengusung pendekatan **Offline-First**, memungkinkan siswa berlatih
 9. **Keamanan Ujian CBT:**
    - Pencegahan tangkapan layar (*anti-screenshot*) dan perekaman layar via platform channel `FLAG_SECURE`.
    - Pencegahan seleksi teks dan penyalinan soal (*anti-copy*) melalui `SelectionContainer.disabled`.
+
+10. **Optimasi Kompilasi Android Release (v0.1.6):**
+    - Konfigurasi Gradle Android diperbarui dengan `kotlin.incremental=false` pada `gradle.properties` untuk mencegah kendala *file locking incremental cache* pada sistem operasi Windows.
+    - Penyesuaian batas minimum SDK Android menjadi `minSdk = 21` pada `build.gradle.kts` demi kompatibilitas stabil modul pemutar video.
+    - Seluruh proses kompilasi `flutter build apk --release` terverifikasi sukses 100% menghasilkan `app-release.apk` (54.2 MB).
 
 ---
 

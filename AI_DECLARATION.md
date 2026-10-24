@@ -29,6 +29,7 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **v0.0.5** | Minggu 5 | Sesi ujian CBT interaktif (`LatihanSoalScreen`), Portal Guru Pendamping (Dashboard & Daftar Asesi), penyelarasan warna tema logo, dan finalisasi berkas UTS. |
 | **v0.1.0 (UTS)** | Minggu 6 | Smooth navigation guru, floating AI chatbot scaffolding, keamanan ujian (anti-screenshot & anti-copy), Bank Soal guru, dan penyempurnaan UI. |
 | **v0.1.5 (Progres 5)** | Pasca-UTS | Video splash screen (3-5s), tutorial pengguna baru (onboarding walkthrough), konfirmasi kata sandi pendaftaran, login/daftar akun Google, fitur lupa kata sandi via email, direct access tab Kelas untuk guru, UI Pengaturan Guru lengkap, implementasi UI interaktif Chat Bot AI, pembersihan data demo, dan penyesuaian tanggal dinamis (WIB). |
+| **v0.1.6** | Pasca-UTS | Perbaikan kegagalan build APK di Windows (`kotlin.incremental=false`), penghentian daemon pengunci file, konfigurasi `minSdk 21`, dan optimasi kompilasi `assembleRelease`. |
 
 ---
 
@@ -93,6 +94,15 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   - **Pembersihan Data Demo & Arsitektur Backend:** Menghapus badge statis Pusdatin/BNSP non-fungsional dan membuat `BackendConfig` sebagai jembatan kesiapan API Firebase & Supabase.
   - **Otomatisasi Git & Versioning:** Disimpan aturan kerja otomatisasi commit dan kenaikan versi di `.agents/rules/auto_commit_and_version.md`.
 
+### 📅 Pembaruan Pasca-UTS (Rilis v0.1.6): Perbaikan Kompilasi APK Release & Penyesuaian Gradle Windows
+- **Fokus Utama:** Mengatasi galat build APK Android (`assembleRelease` / `assembleDebug`) di Windows akibat penguncian file incremental cache Kotlin serta memastikan kompatibilitas `minSdkVersion`.
+- **Implementasi:**
+  - Penambahan parameter `kotlin.incremental=false` pada `android/gradle.properties` untuk menonaktifkan cache inkremental Kotlin yang sering mengalami *file locking* di sistem operasi Windows.
+  - Penyesuaian batas minimum SDK menjadi `minSdk = flutter.minSdkVersion.coerceAtLeast(21)` pada `android/app/build.gradle.kts` demi kompatibilitas penuh decoder pemutar video `video_player_android`.
+  - Pembersihan cache lama (`flutter clean`) dan terminasi Gradle daemon yang aktif di memori (`gradlew --stop`).
+  - Verifikasi build APK rilis berhasil 100% menghasilkan `app-release.apk` (54.2 MB) siap pasang.
+  - Formalisasi aturan otomatisasi perbaruan dokumentasi (`README.md` dan `AI_DECLARATION.md`) di `.agents/rules/auto_commit_and_version.md`.
+
 ---
 
 ## 3. Pembagian Peran (Human vs AI Contribution)
@@ -109,6 +119,7 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **Portal Guru & Menu Kelas Pertama** | Meminta agar saat masuk akun guru pendamping, menu yang pertama terbuka langsung adalah menu *Kelas*. | Mengubah parameter navigasi guru menjadi `initialIndex: 0` (`GuruDaftarAsesiScreen`). |
 | **Pengaturan Guru & Chat Bot AI** | Meminta pembuatan antarmuka lengkap Pengaturan Guru dan layar interaktif AI Assistant. | Mengimplementasikan `GuruPengaturanScreen` dan `ChatBotScreen` dengan respons kontekstual UKK. |
 | **Pembersihan Demo & Tanggal WIB** | Menginstruksikan penghapusan badge demo (gambar lampiran) dan penyesuaian tahun 2024 ke tanggal sekarang (WIB). | Menghapus widget Pusdatin/BNSP statis dan membuat `DateFormatter` berbasis waktu lokal HP. |
+| **Penyelesaian Build APK & Gradle Windows** | Melaporkan kendala kompilasi APK (`BUILD FAILED`) beserta tangkapan layar terminal error. | Mendiagnosis galat *incremental cache locking* Windows, mengonfigurasi `kotlin.incremental=false`, dan menguji rilis APK. |
 | **Debugging & Quality Assurance** | Menguji fungsionalitas, mengevaluasi lint issue dengan `flutter analyze`, serta memastikan zero error & zero warning. | Memperbaiki peringatan deprecated member (`activeThumbColor`), mengatasi overflow RenderFlex, dan menyelaraskan widget test. |
 
 ---
@@ -149,6 +160,19 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   1. Membatasi pemutaran video menggunakan `Timer` internal berdurasi 3.8 detik dan menambahkan tombol *Lewati* berhitung mundur agar pengguna dapat melompat langsung.
   2. Menambahkan `Expanded` pada label baris judul form untuk mencegah layout terpotong (*overflow*) pada semua resolusi layar ponsel.
   3. Menambahkan pengujian otomatis pada `test/widget_test.dart` dengan simulasi `SharedPreferences.setMockInitialValues` sehingga seluruh alur navigasi dari splash menuju onboarding dan login terverifikasi hijau 100%.
+
+---
+
+### Studi Kasus 4: Penanganan Galat Kompilasi APK Gradle `Could not close incremental caches` di Windows
+- **Tujuan / Instruksi (Prompt):**  
+  *"ini flutter build apk nya kenapa failed?" (disertai tangkapan layar terminal error assembleRelease)*
+- **Keluaran Awal / Diagnosa Masalah:**  
+  Log kompilasi menunjukkan `java.lang.Exception: Could not close incremental caches in ... build\video_player_android\kotlin\compileReleaseKotlin\cacheable\...`. Hal ini terjadi karena proses Kotlin daemon lama menahan handle file `.tab` di Windows saat proses kompilasi parallel.
+- **Tindakan & Solusi:**  
+  1. Menghentikan daemon yang tertahan melalui `gradlew.bat --stop`.
+  2. Menambahkan `kotlin.incremental=false` pada `android/gradle.properties`.
+  3. Memastikan `minSdk` minimal 21 di `android/app/build.gradle.kts` untuk plugin video.
+  4. Menjalankan pengujian build hingga menghasilkan `app-release.apk` (54.2 MB) dengan status sukses (`BUILD SUCCESSFUL`).
 
 ---
 
