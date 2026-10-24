@@ -1,25 +1,28 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ukkmate/main.dart';
+import 'package:ukkmate/features/splash/splash_screen.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   testWidgets('aplikasi menampilkan splash lalu halaman login', (
     WidgetTester tester,
   ) async {
+    SharedPreferences.setMockInitialValues({'has_seen_onboarding': true});
+
     await tester.pumpWidget(const MyApp());
-
     await tester.pump();
-    expect(find.text('V1.0 • SMK BISA'), findsOneWidget);
 
-    await tester.pump(const Duration(seconds: 3));
-    await tester.pump();
+    // Verify splash screen is displayed
+    expect(find.byType(SplashScreen), findsOneWidget);
+    expect(find.textContaining('UKKMate'), findsWidgets);
+
+    // Advance timer past splash duration (4 seconds)
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
+
+    // Verify login portal is reached
     expect(find.text('Portal Masuk UKKMate'), findsOneWidget);
   });
 }

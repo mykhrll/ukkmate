@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ukkmate/core/theme/app_colors.dart';
 import 'package:ukkmate/core/theme/app_text_styles.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:ukkmate/core/utils/date_formatter.dart';
 
 class RiwayatScreen extends StatelessWidget {
   const RiwayatScreen({super.key});
@@ -249,7 +250,7 @@ class RiwayatScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Berdasarkan capaian akumulatif, Anda berpeluang lulus predikat Unggul pada Uji Kompetensi Keahlian SMK 2026.',
+            'Berdasarkan capaian akumulatif, Anda berpeluang lulus predikat Unggul pada Uji Kompetensi Keahlian SMK ${DateFormatter.currentYear}.',
             style: AppTextStyles.caption.copyWith(color: Colors.white.withValues(alpha: 0.9)),
           ),
           const SizedBox(height: 24),
@@ -526,11 +527,11 @@ class RiwayatScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        _buildHistoryItem('#12', 'Simulasi Mandiri Paket A RPL', '12 Okt 2026 • 40 Butir Soal', '88', true),
+        _buildHistoryItem('#12', 'Simulasi Mandiri Paket A RPL', '${DateFormatter.formatShortDate(DateTime.now().subtract(const Duration(days: 1)))} • 40 Butir Soal', '88', true),
         const SizedBox(height: 12),
-        _buildHistoryItem('#11', 'Latihan Quiz Database & Query', '10 Okt 2026 • 25 Soal', '86', true),
+        _buildHistoryItem('#11', 'Latihan Quiz Database & Query', '${DateFormatter.formatShortDate(DateTime.now().subtract(const Duration(days: 3)))} • 25 Soal', '86', true),
         const SizedBox(height: 12),
-        _buildHistoryItem('#10', 'Tryout Terjadwal Sekolah (S..', '05 Okt 2026 • 50 Soal', '92', true),
+        _buildHistoryItem('#10', 'Tryout Terjadwal Sekolah (S..', '${DateFormatter.formatShortDate(DateTime.now().subtract(const Duration(days: 7)))} • 50 Soal', '92', true),
         const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,

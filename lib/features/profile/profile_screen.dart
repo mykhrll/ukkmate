@@ -9,6 +9,8 @@ import 'package:ukkmate/features/profile/profil_siswa_screen.dart';
 import 'package:ukkmate/features/sinkronisasi/status_sinkronisasi_screen.dart';
 
 import 'package:ukkmate/features/bantuan/bantuan_screen.dart';
+import 'package:ukkmate/core/utils/date_formatter.dart';
+import 'package:ukkmate/features/onboarding/onboarding_tutorial_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -86,7 +88,7 @@ class ProfileScreen extends StatelessWidget {
           const Divider(height: 24),
           _buildInfoRow('Kompetensi Keahlian', 'Rekayasa Perangkat Lunak'),
           const Divider(height: 24),
-          _buildInfoRow('Tahun Ajaran', '2023/2024'),
+          _buildInfoRow('Tahun Ajaran', DateFormatter.currentAcademicYear),
         ],
       ),
     );
@@ -122,6 +124,20 @@ class ProfileScreen extends StatelessWidget {
             style: AppTextStyles.headline3,
           ),
           const SizedBox(height: 16),
+          SettingsItem(
+            icon: Icons.menu_book_outlined,
+            title: 'Panduan & Petunjuk Aplikasi',
+            subtitle: 'Tutorial cara menggunakan fitur UKKMate',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const OnboardingTutorialScreen(isFromSettings: true),
+                ),
+              );
+            },
+          ),
+          const Divider(height: 16),
           SettingsItem(
             icon: Icons.edit_outlined,
             title: 'Edit Profil & Validasi NISN',
@@ -160,7 +176,7 @@ class ProfileScreen extends StatelessWidget {
           SettingsItem(
             icon: Icons.info_outline,
             title: 'Tentang Aplikasi',
-            subtitle: 'Versi 0.1.0',
+            subtitle: 'Versi 0.1.5',
             onTap: () {},
           ),
         ],

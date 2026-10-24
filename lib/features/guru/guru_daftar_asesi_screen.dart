@@ -164,7 +164,7 @@ class GuruDaftarAsesiScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Text('ROMBEL AKTIF UKK 2025', style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.bold, fontSize: 10)),
+              Text('ROMBEL AKTIF UKK ${DateTime.now().year}', style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.bold, fontSize: 10)),
               const SizedBox(width: 16),
               Text('Total: 72 Siswa', style: AppTextStyles.caption.copyWith(fontSize: 10)),
             ],

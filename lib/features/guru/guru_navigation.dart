@@ -5,10 +5,10 @@ import 'package:ukkmate/core/widgets/floating_chat_button.dart';
 import 'package:ukkmate/features/guru/guru_daftar_asesi_screen.dart';
 import 'package:ukkmate/features/guru/guru_bank_soal_screen.dart';
 import 'package:ukkmate/features/guru/guru_dashboard_screen.dart';
+import 'package:ukkmate/features/guru/guru_pengaturan_screen.dart';
 
 /// Unified navigation wrapper for the Guru (Teacher) portal.
-/// Uses the same pattern as [MainNavigation] for smooth tab switching
-/// instead of pushReplacement which causes page-jump effects.
+/// Defaults to Kelas tab (initialIndex = 0) upon opening.
 class GuruNavigation extends StatefulWidget {
   final int initialIndex;
   const GuruNavigation({super.key, this.initialIndex = 0});
@@ -24,7 +24,7 @@ class _GuruNavigationState extends State<GuruNavigation> {
     GuruDaftarAsesiScreen(embedded: true),
     GuruBankSoalScreen(embedded: true),
     GuruDashboardScreen(embedded: true),
-    _GuruPengaturanPlaceholder(),
+    GuruPengaturanScreen(embedded: true),
   ];
 
   @override
@@ -98,46 +98,6 @@ class _GuruNavigationState extends State<GuruNavigation> {
               label: 'Pengaturan',
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Placeholder screen for Guru Pengaturan (Settings) tab.
-class _GuruPengaturanPlaceholder extends StatelessWidget {
-  const _GuruPengaturanPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.settings_outlined,
-                size: 64,
-                color: AppColors.textSecondary.withValues(alpha: 0.5),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Pengaturan Guru',
-                style: AppTextStyles.headline3.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Fitur pengaturan akan segera hadir',
-                style: AppTextStyles.bodyText2.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

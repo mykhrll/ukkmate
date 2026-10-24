@@ -9,6 +9,7 @@ import 'package:ukkmate/features/tugas/tugas_screen.dart';
 import 'package:ukkmate/features/materi/materi_screen.dart';
 import 'package:ukkmate/features/bantuan/bantuan_screen.dart';
 import 'package:ukkmate/features/navigation/main_navigation.dart';
+import 'package:ukkmate/core/utils/date_formatter.dart';
 
 class HomeScreen extends StatelessWidget {
   final void Function(int index)? onNavigateTab;
@@ -123,19 +124,31 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              'UJI KOMPETENSI 2024',
-              style: AppTextStyles.caption.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  'UJI KOMPETENSI ${DateFormatter.currentYear}',
+                  style: AppTextStyles.caption.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
+              Text(
+                DateFormatter.getCurrentFullDateWithWib(),
+                style: AppTextStyles.caption.copyWith(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontSize: 10,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Text(

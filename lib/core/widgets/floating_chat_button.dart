@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ukkmate/core/theme/app_colors.dart';
-import 'package:ukkmate/core/theme/app_text_styles.dart';
+import 'package:ukkmate/features/chatbot/chatbot_screen.dart';
 
 /// A floating action button for the AI chatbot assistant.
 ///
@@ -83,7 +83,13 @@ class _FloatingChatButtonState extends State<FloatingChatButton>
       child: Padding(
         padding: const EdgeInsets.only(bottom: 16, right: 4),
         child: FloatingActionButton(
-          onPressed: widget.onPressed ?? () => _showChatComingSoon(context),
+          onPressed: widget.onPressed ??
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ChatBotScreen()),
+                );
+              },
           backgroundColor: AppColors.primaryBlue,
           elevation: 6,
           shape: const CircleBorder(),
@@ -94,76 +100,6 @@ class _FloatingChatButtonState extends State<FloatingChatButton>
           ),
         ),
       ),
-    );
-  }
-
-  void _showChatComingSoon(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 48,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.borderLight,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryBlue.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.smart_toy,
-                  color: AppColors.primaryBlue,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'UKK Assistant',
-                style: AppTextStyles.headline3,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Asisten AI untuk membantu belajar dan persiapan UKK.\nFitur ini akan segera hadir!',
-                textAlign: TextAlign.center,
-                style: AppTextStyles.bodyText2.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryBlue,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text('Mengerti', style: AppTextStyles.buttonText),
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        );
-      },
     );
   }
 }
