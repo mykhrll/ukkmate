@@ -33,6 +33,8 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **v0.1.7** | Pasca-UTS | Integrasi galeri visual 19 mockup UI aplikasi ke `README.md`, penambahan logo header terpusat, pengelompokan alur antarmuka komprehensif, dan sinkronisasi versi aplikasi. |
 | **v0.1.8** | Minggu 6 | Penyempurnaan video splash screen murni sinematik: penghapusan kedipan splash screen lama (fallback UI), penghapusan tombol lewati & overlay branding footer, serta inisiasi progres Minggu ke 6. |
 | **v0.1.9** | Minggu 6 | Dukungan debugging web browser Google Chrome: inisialisasi timer independen anti-stuck, penyesuaian Chrome Autoplay Policy (`volume 0`), CSS styling background di `index.html`, isolasi platform channel web, dan frame preview responsif (`maxWidth: 480`). |
+| **v0.2.0** | Minggu 6 | Implementasi pemutaran penuh video splash screen 3 detik (`assets/splash-screen.mp4`) hingga selesai tanpa dipotong (*video completion listener*), buffer timer toleransi dinamis, dan penyelesaian modul splash Minggu ke 6. |
+
 
 
 
@@ -140,6 +142,14 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   - **Frame Responsif Mobile-Optimized:** Menambahkan wrapper `builder` di `main.dart` berbasis `maxWidth: 480` yang terpusat rapi saat dijalankan di browser desktop, sehingga layout mobile-first tetap proporsional saat diuji di layar PC/laptop.
   - **Isolasi Fitur Platform Native:** Membungkus platform channel `FLAG_SECURE` dan `SystemChrome` di `exam_session_screen.dart` dengan kondisi `if (!kIsWeb)`.
 
+### 📅 Progres Minggu ke 6 (Rilis v0.2.0): Pemutaran Penuh Video Splash Screen 3 Detik (Full Playback)
+- **Fokus Utama:** Memperbarui logika pemutaran splash screen agar memutar berkas video `assets/splash-screen.mp4` baru yang telah disunting pengguna menjadi tepat 3 detik secara penuh hingga selesai tanpa dipotong paksa oleh timer.
+- **Implementasi:**
+  - Menghubungkan listener `_controller!.addListener(_handleVideoProgress)` untuk mendeteksi event saat posisi pemutaran mencapai batas akhir durasi video (`position >= duration`).
+  - Menghapus pembatasan pemotongan durasi paksa (3.8s) dan menggantinya dengan navigasi reaktif berbasis penyelesaian video secara alami.
+  - Menambahkan buffer toleransi fallback dinamis `duration + 300ms` untuk memastikan navigasi tetap terjamin 100% jika terjadi keterlambatan decoding frame di lingkungan perangkat tertentu.
+  - Sinkronisasi versi aplikasi ke `v0.2.0+12`.
+
 ---
 
 ## 3. Pembagian Peran (Human vs AI Contribution)
@@ -152,6 +162,7 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **Galeri Dokumentasi Visual Mockup** | Memberikan instruksi penambahan mockup yang tersimpan di direktori `assets/` ke dalam `README.md`. | Mengelompokkan 19 tangkapan layar antarmuka ke dalam 5 kategori alur logis serta menyusun tata letak galeri tabel responsif di GitHub. |
 | **Penyempurnaan Splash Sinematik (Minggu 6)** | Menginstruksikan penghapusan splash lama yang berkedip, tombol lewati, dan teks footer branding. | Merombak arsitektur `SplashScreen` menjadi pure video player dengan background matching dan membersihkan timer/overlay. |
 | **Dukungan Web Debug Chrome (Minggu 6)** | Melaporkan kendala saat debugging di Chrome (layar terbelah putih dan stuck) disertai screenshot browser. | Mendiagnosis video autoplay policy & async timer hanging di web, menambahkan CSS background, dan membuat mobile preview frame. |
+| **Video Splash 3 Detik Utuh (Minggu 6)** | Memperbarui berkas `assets/splash-screen.mp4` menjadi tepat 3 detik dan meminta video ditampilkan hingga selesai tanpa dipotong. | Mengimplementasikan `video completion listener` reaktif (`position >= duration`) dengan toleransi buffer dinamis. |
 | **Video Splash Screen & Durasi 3–5s** | Menentukan durasi splash video 10 detik agar dipersingkat menjadi 3–5 detik dengan tombol lewati. | Mengimplementasikan kontrol `VideoPlayerController`, timer navigasi 3.8s, dan countdown UI. |
 | **Tutorial Pengguna Baru (Onboarding)** | Mengarahkan pembuatan panduan cara memakai aplikasi untuk pengguna pertama kali install. | Merancang `OnboardingTutorialScreen` dengan `PageView`, dot indicator, dan integrasi `SharedPreferences`. |
 | **Konfirmasi Kata Sandi & Validasi** | Mewajibkan input kata sandi 2 kali saat pendaftaran untuk mencegah kesalahan ketik pengguna. | Membuat field konfirmasi, *real-time match validator*, dan pengecekan form. |

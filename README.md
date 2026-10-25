@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.1.9 (Dukungan Web Debug Chrome & Penyempurnaan Splash Screen)  
+> **Versi Aplikasi:** v0.2.0 (Video Splash Screen 3 Detik Penuh & Penyelesaian Splash Minggu ke 6)  
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -56,12 +56,13 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.1.8)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.0)
 
-1. **Video Splash Screen Murni & Sinematik (v0.1.8):**
-   - Menampilkan animasi video splash screen resolusi tinggi (`assets/splash-screen.mp4`) secara mulus (*seamless*) dengan transisi layar yang bersih.
-   - Menghapus tampilan splash screen lama (logo kotak, indikator progres, dan teks 'Memuat UKKMate...'), menghilangkan tombol lewati di pojok kanan atas, serta membersihkan teks footer branding agar tampilan splash sepenuhnya bersih dan berfokus pada video pembuka.
-   - Durasi pemutaran terukur 3.8 detik dan otomatis beralih ke onboarding tutorial atau portal login terpadu.
+1. **Video Splash Screen Sinematik 3 Detik Penuh (v0.2.0):**
+   - Menampilkan berkas video animasi resolusi tinggi `assets/splash-screen.mp4` baru yang telah dipersingkat dan dioptimalkan menjadi tepat 3 detik.
+   - Video kini diputar secara utuh hingga selesai (*completion listener*) tanpa dipotong atau terhenti mendadak.
+   - Transisi layar bersih tanpa tampilan splash lama yang berkedip, tanpa tombol lewati, dan tanpa teks footer branding sehingga memberikan kesan visual aplikasi yang profesional.
+
 
 
 2. **Panduan & Tutorial Aplikasi (Onboarding Walkthrough):**
