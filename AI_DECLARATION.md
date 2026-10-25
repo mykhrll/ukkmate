@@ -35,6 +35,8 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **v0.1.9** | Minggu 6 | Dukungan debugging web browser Google Chrome: inisialisasi timer independen anti-stuck, penyesuaian Chrome Autoplay Policy (`volume 0`), CSS styling background di `index.html`, isolasi platform channel web, dan frame preview responsif (`maxWidth: 480`). |
 | **v0.2.0** | Minggu 6 | Implementasi pemutaran penuh video splash screen 3 detik (`assets/splash-screen.mp4`) hingga selesai tanpa dipotong (*video completion listener*), buffer timer toleransi dinamis, dan penyelesaian modul splash Minggu ke 6. |
 | **v0.2.1** | Minggu 6 | Perbaikan galat Gradle build `this and base files have different roots` di Windows akibat pemisahan drive proyek (Drive D:) dan Pub Cache (Drive C:) melalui pengecekan drive root pada `android/build.gradle.kts`. |
+| **v0.2.2** | Minggu 6 | Penambahan deklarasi plugin `com.android.library` di `android/settings.gradle.kts` dan konfigurasi isolasi Java Language Server pada `.vscode/settings.json` untuk menghilangkan galat notifikasi IDE 'Source: Java'. |
+
 
 
 
@@ -160,6 +162,13 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   - Pengujian eksekusi `gradlew tasks` dan `flutter build apk --debug` terverifikasi sukses 100% tanpa galat.
   - Sinkronisasi versi aplikasi ke `v0.2.1+13`.
 
+### 📅 Progres Minggu ke 6 (Rilis v0.2.2): Resolusi Notifikasi Java Language Server & Deklarasi Plugin Library
+- **Fokus Utama:** Mengatasi notifikasi pop-up kesalahan merah di IDE (`Source: Java`) di mana Language Server mencoba mengonfigurasi subproyek plugin (`video_player_android`, `jni`, `shared_preferences_android`) sebagai root project Java independen dan melaporkan `Plugin [id: 'com.android.library'] was not found`.
+- **Implementasi:**
+  - Menambahkan deklarasi eksplisit `id("com.android.library") version "9.1.0" apply false` di dalam blok `plugins` pada `android/settings.gradle.kts` agar Gradle resolution mengenali versi AGP Library yang seragam untuk semua subproyek plugin.
+  - Menambahkan konfigurasi isolasi `java.import.gradle.enabled: false` dan `java.autobuild.enabled: false` pada `.vscode/settings.json` sehingga Java Language Server Red Hat tidak mencoba mengompilasi subproyek internal Flutter secara terpisah.
+  - Sinkronisasi versi aplikasi ke `v0.2.2+14`.
+
 ---
 
 ## 3. Pembagian Peran (Human vs AI Contribution)
@@ -174,6 +183,7 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **Dukungan Web Debug Chrome (Minggu 6)** | Melaporkan kendala saat debugging di Chrome (layar terbelah putih dan stuck) disertai screenshot browser. | Mendiagnosis video autoplay policy & async timer hanging di web, menambahkan CSS background, dan membuat mobile preview frame. |
 | **Video Splash 3 Detik Utuh (Minggu 6)** | Memperbarui berkas `assets/splash-screen.mp4` menjadi tepat 3 detik dan meminta video ditampilkan hingga selesai tanpa dipotong. | Mengimplementasikan `video completion listener` reaktif (`position >= duration`) dengan toleransi buffer dinamis. |
 | **Resolusi Cross-Drive Gradle Windows (Minggu 6)** | Melaporkan log galat terminal Gradle for Java (`this and base files have different roots: D:\ and C:\`). | Menganalisis batasan path relativization multi-drive di Windows, memvalidasi drive root di `build.gradle.kts`, dan memverifikasi build debug APK. |
+| **Resolusi Java Language Server IDE (Minggu 6)** | Melaporkan tangkapan layar pop-up notifikasi error `Source: Java` pada subproject plugin Android. | Mendaftarkan `com.android.library` di `settings.gradle.kts` dan mengonfigurasi isolasi Language Server di `.vscode/settings.json`. |
 | **Video Splash Screen & Durasi 3–5s** | Menentukan durasi splash video 10 detik agar dipersingkat menjadi 3–5 detik dengan tombol lewati. | Mengimplementasikan kontrol `VideoPlayerController`, timer navigasi 3.8s, dan countdown UI. |
 | **Tutorial Pengguna Baru (Onboarding)** | Mengarahkan pembuatan panduan cara memakai aplikasi untuk pengguna pertama kali install. | Merancang `OnboardingTutorialScreen` dengan `PageView`, dot indicator, dan integrasi `SharedPreferences`. |
 | **Konfirmasi Kata Sandi & Validasi** | Mewajibkan input kata sandi 2 kali saat pendaftaran untuk mencegah kesalahan ketik pengguna. | Membuat field konfirmasi, *real-time match validator*, dan pengecekan form. |
@@ -267,8 +277,23 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 
 ---
 
+### Studi Kasus 7: Penanganan Galat Pop-Up Language Server Java IDE (`Plugin [id: 'com.android.library'] was not found`)
+- **Tujuan / Instruksi (Prompt):**  
+  *"source java ini kenapa error ya, coba tolong perbaiki" (disertai tangkapan layar pop-up notifikasi kesalahan merah IDE "Source: Java" yang melaporkan kegagalan konfigurasi root project 'video_player_android', 'jni', 'shared_preferences_android', 'jni_flutter' dengan keterangan "Plugin [id: 'com.android.library'] was not found in any of the following sources").*
+- **Keluaran Awal / Diagnosa Masalah:**  
+  1. Ekstensi Red Hat Java / Language Server for Java di Antigravity IDE (VS Code) mendeteksi file build Gradle pada folder plugin Android di direktori cache Pub dan secara keliru memperlakukan masing-masing folder plugin tersebut sebagai *root project* Java mandiri, bukan sebagai subproyek yang dikelola oleh Flutter.
+  2. Ketika subproyek tersebut dievaluasi secara terisolasi oleh Language Server, deklarasi plugin `com.android.library` tidak ditemukan karena plugin tersebut diaplikasikan tanpa menyertakan nomor versi eksplisit di submodul, sementara berkas root `android/settings.gradle.kts` awalnya hanya mendaftarkan `com.android.application`.
+  3. Akibatnya, IDE memunculkan notifikasi galat merah bertubi-tubi ("Source: Java") di pojok kanan bawah editor setiap kali proses *indexing* atau *auto-build* Java berlangsung.
+- **Tindakan & Solusi:**  
+  1. Mendaftarkan plugin `com.android.library` secara eksplisit dengan nomor versi Android Gradle Plugin yang konsisten (`id("com.android.library") version "9.1.0" apply false`) di dalam blok `plugins { ... }` pada berkas `android/settings.gradle.kts`. Hal ini menjamin tersedianya resolusi versi `com.android.library` bagi seluruh subproyek Android.
+  2. Mengonfigurasi isolasi Language Server pada `.vscode/settings.json` dengan menyetel `"java.import.gradle.enabled": false` dan `"java.autobuild.enabled": false` agar ekstensi Java di IDE tidak memindai subproyek internal Flutter pihak ketiga sebagai proyek Java terpisah di luar alur resmi Flutter Tools.
+  3. Memvalidasi bahwa seluruh analisis statis (`flutter analyze`) dan pengujian widget (`flutter test`) lulus 100% tanpa hambatan.
+
+---
+
 ## 5. Rencana Target Fitur Menuju Akhir Semester (UAS)
 1. **Integrasi Backend Database Nyata (Supabase & Firebase):** Mengaktifkan modul database real-time cloud menggantikan cache lokal sementara, mengaitkan autentikasi siswa dan guru ke live database.
 2. **Penyimpanan Lokal Persisten Lanjutan (SQLite / Isar / Drift):** Menyempurnakan fitur *Offline-First* agar seluruh riwayat pengerjaan soal dan cache paket materi tersimpan permanen di perangkat lokal mahasiswa saat tidak ada sinyal di ruang ujian.
 3. **Fitur Presensi / Validasi QR Code CBT Lab:** Menambahkan scanner kamera untuk memindai kode QR workstation lab komputer saat ujian simulasi UKK berlangsung.
 4. **Penyempurnaan Kecerdasan Buatan UKKMate:** Menghubungkan chatbot asisten ke backend LLM API agar dapat memberikan jawaban analitis dinamis seputar kode program dan studi kasus siswa secara real-time.
+

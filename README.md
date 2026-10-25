@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.1 (Perbaikan Cross-Drive Gradle Build di Windows & Stabilisasi IDE)  
+> **Versi Aplikasi:** v0.2.2 (Resolusi Notifikasi Java Language Server & Deklarasi Plugin Library)  
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -56,7 +56,7 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.0)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.2)
 
 1. **Video Splash Screen Sinematik 3 Detik Penuh (v0.2.0):**
    - Menampilkan berkas video animasi resolusi tinggi `assets/splash-screen.mp4` baru yang telah dipersingkat dan dioptimalkan menjadi tepat 3 detik.
@@ -122,6 +122,12 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
     - Memperbaiki galat `this and base files have different roots` pada Gradle saat proyek berada di drive berbeda (Drive D:) dari cache paket Pub (`C:\Users\...\AppData\Local\Pub\Cache`).
     - Memperbarui `android/build.gradle.kts` dengan validasi kecocokan drive root sebelum mengubah `buildDirectory` subproyek plugin pihak ketiga.
     - Menjamin kelancaran inspeksi ekstensi IDE Gradle for Java serta kompilasi APK debug/release secara mulus tanpa kegagalan task.
+
+14. **Resolusi Notifikasi Java Language Server IDE (v0.2.2):**
+    - Mendaftarkan deklarasi plugin `com.android.library` secara eksplisit pada `android/settings.gradle.kts` agar seluruh modul plugin Android mengenali versi AGP yang seragam.
+    - Mengonfigurasi `.vscode/settings.json` dengan isolasi `java.import.gradle.enabled: false` untuk mencegah Language Server Red Hat Java mengimpor subproyek plugin Flutter sebagai root project Java independen.
+    - Menghilangkan seluruh pop-up peringatan merah 'Source: Java' di IDE.
+
 
 
 
