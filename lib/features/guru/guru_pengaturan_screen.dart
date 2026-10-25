@@ -4,7 +4,7 @@ import 'package:ukkmate/core/theme/app_text_styles.dart';
 import 'package:ukkmate/core/utils/date_formatter.dart';
 import 'package:ukkmate/core/services/backend_config.dart';
 import 'package:ukkmate/features/auth/login_screen.dart';
-import 'package:ukkmate/features/onboarding/onboarding_tutorial_screen.dart';
+import 'package:ukkmate/features/guru/guru_navigation.dart';
 import 'package:ukkmate/features/chatbot/chatbot_screen.dart';
 
 class GuruPengaturanScreen extends StatefulWidget {
@@ -429,16 +429,11 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
         children: [
           ListTile(
             leading: const Icon(Icons.menu_book_outlined, color: AppColors.primaryBlue),
-            title: Text('Panduan & Petunjuk Aplikasi', style: AppTextStyles.bodyText1),
-            subtitle: Text('Pelajari alur ujian, import soal, dan penilaian UKK', style: AppTextStyles.caption),
+            title: Text('Panduan & Petunjuk Menu Guru', style: AppTextStyles.bodyText1),
+            subtitle: Text('Buka kembali tur interaktif menu portal guru', style: AppTextStyles.caption),
             trailing: const Icon(Icons.arrow_forward_ios, size: 14),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const OnboardingTutorialScreen(isFromSettings: true),
-                ),
-              );
+              GuruNavigation.startTour(context);
             },
           ),
           const Divider(height: 1),
@@ -458,7 +453,7 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
           ListTile(
             leading: const Icon(Icons.info_outline, color: AppColors.textSecondary),
             title: Text('Tentang UKKMate Guru', style: AppTextStyles.bodyText1),
-            subtitle: Text('Versi 0.2.2 • Standar BNSP & Dapodik', style: AppTextStyles.caption),
+            subtitle: Text('Versi 0.2.3 • Standar BNSP & Dapodik', style: AppTextStyles.caption),
             trailing: const Icon(Icons.arrow_forward_ios, size: 14),
             onTap: () {},
           ),

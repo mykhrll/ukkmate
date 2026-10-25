@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.2 (Resolusi Notifikasi Java Language Server & Deklarasi Plugin Library)  
+> **Versi Aplikasi:** v0.2.3 (Panduan Interaktif Popup Menu Pasca-Login & Direct Splash Navigation)  
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -56,7 +56,7 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.2)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.3)
 
 1. **Video Splash Screen Sinematik 3 Detik Penuh (v0.2.0):**
    - Menampilkan berkas video animasi resolusi tinggi `assets/splash-screen.mp4` baru yang telah dipersingkat dan dioptimalkan menjadi tepat 3 detik.
@@ -127,6 +127,12 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
     - Mendaftarkan deklarasi plugin `com.android.library` secara eksplisit pada `android/settings.gradle.kts` agar seluruh modul plugin Android mengenali versi AGP yang seragam.
     - Mengonfigurasi `.vscode/settings.json` dengan isolasi `java.import.gradle.enabled: false` untuk mencegah Language Server Red Hat Java mengimpor subproyek plugin Flutter sebagai root project Java independen.
     - Menghilangkan seluruh pop-up peringatan merah 'Source: Java' di IDE.
+
+15. **Panduan Dasar Interaktif Popup Menu Pasca-Login (v0.2.3):**
+    - Mengganti alur onboarding slide layar penuh sebelum login menjadi **Tur Interaktif Berbasis Popup Menu (Coach Mark / Spotlight)** yang muncul saat pengguna pertama kali berhasil masuk (*post-login* / *signup*).
+    - Menampilkan kartu pop-up terarah dengan panah penunjuk (*pointer arrow*) ke masing-masing menu utama (Beranda, Latihan, Riwayat, Profil, dan AI Assistant) disertai penjelasan fungsi dasar yang ringkas, padat, dan esensial.
+    - Dilengkapi kontrol langkah (*Kembali*, *Lanjut*, *Lewati*, *Mulai Jelajahi*), transisi pergantian tab otomatis secara *real-time*, dan opsi membuka kembali tur kapan saja dari menu Profil Siswa maupun Pengaturan Guru.
+    - Splash screen kini langsung mengarahkan pengguna ke portal masuk (`LoginScreen`) secara mulus tanpa interupsi.
 
 
 

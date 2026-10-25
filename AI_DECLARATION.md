@@ -169,6 +169,16 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   - Menambahkan konfigurasi isolasi `java.import.gradle.enabled: false` dan `java.autobuild.enabled: false` pada `.vscode/settings.json` sehingga Java Language Server Red Hat tidak mencoba mengompilasi subproyek internal Flutter secara terpisah.
   - Sinkronisasi versi aplikasi ke `v0.2.2+14`.
 
+### 📅 Progres Minggu ke 6 (Rilis v0.2.3): Transformasi Tur Interaktif Popup Menu Pasca-Login & Direct Splash
+- **Fokus Utama:** Mengganti konsep tutorial carousel onboarding pra-login yang statis menjadi tur interaktif berbasis kartu pop-up (*in-app coach marks / feature spotlight*) yang muncul saat pengguna pertama kali berhasil masuk (*post-login* / *signup*) ke dashboard utama.
+- **Implementasi:**
+  - Membuat modul `InteractiveTourOverlay` dan `TourStep` di `lib/features/onboarding/interactive_menu_tour.dart` dengan visual kartu melayang, panah segitiga penunjuk (*pointer arrow*), badge langkah, serta tombol *Kembali*, *Lanjut*, *Lewati*, dan *Mulai Jelajahi*.
+  - Menghubungkan tur reaktif ke `MainNavigation` (Siswa) dan `GuruNavigation` (Guru) dengan deteksi status `SharedPreferences` (`has_seen_menu_tour` dan `has_seen_guru_tour`).
+  - Mengimplementasikan sinkronisasi tab navigasi dinamis: antarmuka secara otomatis berpindah ke tab yang sedang diterangkan (Beranda, Latihan, Riwayat, Profil, serta Floating Chat AI) agar pengguna memahami fungsi nyata tiap menu.
+  - Memperbarui `SplashScreen` agar langsung mengarahkan pengguna ke `LoginScreen` tanpa hambatan alur slide onboarding sebelum login.
+  - Menambahkan opsi pemicuan kembali tur interaktif dari menu Profil Siswa dan Pengaturan Guru (`startTour(context)`).
+  - Sinkronisasi versi aplikasi ke `v0.2.3+15` dan penambahan unit test `testWidgets` di `test/widget_test.dart`.
+
 ---
 
 ## 3. Pembagian Peran (Human vs AI Contribution)
@@ -184,6 +194,7 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **Video Splash 3 Detik Utuh (Minggu 6)** | Memperbarui berkas `assets/splash-screen.mp4` menjadi tepat 3 detik dan meminta video ditampilkan hingga selesai tanpa dipotong. | Mengimplementasikan `video completion listener` reaktif (`position >= duration`) dengan toleransi buffer dinamis. |
 | **Resolusi Cross-Drive Gradle Windows (Minggu 6)** | Melaporkan log galat terminal Gradle for Java (`this and base files have different roots: D:\ and C:\`). | Menganalisis batasan path relativization multi-drive di Windows, memvalidasi drive root di `build.gradle.kts`, dan memverifikasi build debug APK. |
 | **Resolusi Java Language Server IDE (Minggu 6)** | Melaporkan tangkapan layar pop-up notifikasi error `Source: Java` pada subproject plugin Android. | Mendaftarkan `com.android.library` di `settings.gradle.kts` dan mengonfigurasi isolasi Language Server di `.vscode/settings.json`. |
+| **Tur Interaktif Popup Menu Pasca-Login (Minggu 6)** | Mengarahkan agar tutorial bukan berbentuk carousel sebelum login, melainkan petunjuk popup terarah tiap menu setelah login dengan penjelasan dasar esensial yang ringkas. | Merancang arsitektur `InteractiveTourOverlay` dengan pointer arrow dinamis, sinkronisasi tab otomatis, integrasi `SharedPreferences`, dan direct splash navigation. |
 | **Video Splash Screen & Durasi 3–5s** | Menentukan durasi splash video 10 detik agar dipersingkat menjadi 3–5 detik dengan tombol lewati. | Mengimplementasikan kontrol `VideoPlayerController`, timer navigasi 3.8s, dan countdown UI. |
 | **Tutorial Pengguna Baru (Onboarding)** | Mengarahkan pembuatan panduan cara memakai aplikasi untuk pengguna pertama kali install. | Merancang `OnboardingTutorialScreen` dengan `PageView`, dot indicator, dan integrasi `SharedPreferences`. |
 | **Konfirmasi Kata Sandi & Validasi** | Mewajibkan input kata sandi 2 kali saat pendaftaran untuk mencegah kesalahan ketik pengguna. | Membuat field konfirmasi, *real-time match validator*, dan pengecekan form. |
@@ -288,6 +299,22 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   1. Mendaftarkan plugin `com.android.library` secara eksplisit dengan nomor versi Android Gradle Plugin yang konsisten (`id("com.android.library") version "9.1.0" apply false`) di dalam blok `plugins { ... }` pada berkas `android/settings.gradle.kts`. Hal ini menjamin tersedianya resolusi versi `com.android.library` bagi seluruh subproyek Android.
   2. Mengonfigurasi isolasi Language Server pada `.vscode/settings.json` dengan menyetel `"java.import.gradle.enabled": false` dan `"java.autobuild.enabled": false` agar ekstensi Java di IDE tidak memindai subproyek internal Flutter pihak ketiga sebagai proyek Java terpisah di luar alur resmi Flutter Tools.
   3. Memvalidasi bahwa seluruh analisis statis (`flutter analyze`) dan pengujian widget (`flutter test`) lulus 100% tanpa hambatan.
+
+---
+
+### Studi Kasus 8: Transformasi Panduan Onboarding Menjadi Tur Interaktif Popup Menu Pasca-Login (Feature Spotlight / Guided Tour)
+- **Tujuan / Instruksi (Prompt):**  
+  *"untuk petunjuk pertama kali pengguna masuk itu bukan seperti itu yang saya mau, tapi setelah signup atau login pengguna baru itu di beri petunjuk tiap menu terus ada keterangan teks nya gitu di popup in ngerti ga, jadi seperti panduan dasar gitu jangan semua nya di jelaskan, jadi petunjuk itu untuk pengguna supaya tau menggunakan aplikasi saya"*
+- **Keluaran Awal / Diagnosa Masalah:**  
+  1. Pada implementasi sebelumnya, panduan pengguna baru berupa `OnboardingTutorialScreen` (carousel 4 slide layar penuh) yang muncul di antara *SplashScreen* dan *LoginScreen*.
+  2. Model onboarding pra-login tersebut membebani pengguna dengan informasi teoritis sebelum mereka sempat masuk atau mencoba antarmuka aplikasi (*cognitive overload* sebelum autentikasi).
+  3. Mahasiswa menginginkan panduan praktis yang tampil langsung di atas antarmuka kerja (*in-context*) setelah login/signup, menyoroti tiap-tiap menu secara berurutan dengan kartu popup dan teks keterangan esensial yang ringkas.
+- **Tindakan & Solusi:**  
+  1. **Direct Splash Navigation:** Memodifikasi `SplashScreen` agar setelah video 3 detik selesai langsung melakukan transisi mulus ke `LoginScreen`.
+  2. **Pembuatan Widget Tur Terarah (`InteractiveTourOverlay`):** Merancang overlay semitransparan dengan kartu pop-up modern di atas navigasi bawah yang dilengkapi panah segitiga penunjuk (*pointer arrow*) terhitung dinamis sesuai posisi tab aktif maupun tombol melayang FAB.
+  3. **Penjelasan Dasar & Ringkas:** Menetapkan 5 langkah petunjuk esensial (Beranda, Latihan, Riwayat, Profil, AI Assistant) dengan teks padat 1–2 kalimat yang fokus pada fungsionalitas harian siswa dan guru.
+  4. **Sinkronisasi Tab Reaktif:** Mengintegrasikan tur ke dalam `MainNavigation` dan `GuruNavigation`, sehingga saat tombol *Lanjut* ditekan, tab aplikasi ikut berganti secara *real-time* ke menu terkait.
+  5. **Pengujian Otomatis:** Menambahkan skenario uji widget di `test/widget_test.dart` untuk memverifikasi munculnya langkah pertama, transisi ke langkah berikutnya, dan penutupan tur via tombol silang/lewati.
 
 ---
 

@@ -10,7 +10,7 @@ import 'package:ukkmate/features/sinkronisasi/status_sinkronisasi_screen.dart';
 
 import 'package:ukkmate/features/bantuan/bantuan_screen.dart';
 import 'package:ukkmate/core/utils/date_formatter.dart';
-import 'package:ukkmate/features/onboarding/onboarding_tutorial_screen.dart';
+import 'package:ukkmate/features/navigation/main_navigation.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -126,15 +126,10 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 16),
           SettingsItem(
             icon: Icons.menu_book_outlined,
-            title: 'Panduan & Petunjuk Aplikasi',
-            subtitle: 'Tutorial cara menggunakan fitur UKKMate',
+            title: 'Panduan & Petunjuk Menu',
+            subtitle: 'Buka kembali tur interaktif menu aplikasi',
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const OnboardingTutorialScreen(isFromSettings: true),
-                ),
-              );
+              MainNavigation.startTour(context);
             },
           ),
           const Divider(height: 16),
@@ -176,7 +171,7 @@ class ProfileScreen extends StatelessWidget {
           SettingsItem(
             icon: Icons.info_outline,
             title: 'Tentang Aplikasi',
-            subtitle: 'Versi 0.2.2',
+            subtitle: 'Versi 0.2.3',
             onTap: () {},
           ),
         ],

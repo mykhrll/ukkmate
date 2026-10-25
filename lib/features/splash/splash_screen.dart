@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import 'package:ukkmate/features/auth/login_screen.dart';
-import 'package:ukkmate/features/onboarding/onboarding_tutorial_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -88,19 +86,12 @@ class _SplashScreenState extends State<SplashScreen> {
       _controller?.pause();
     } catch (_) {}
 
-    final prefs = await SharedPreferences.getInstance();
-    final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
-
     if (!mounted) return;
-
-    final targetScreen = !hasSeenOnboarding
-        ? const OnboardingTutorialScreen()
-        : const LoginScreen();
 
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => targetScreen,
+        pageBuilder: (_, __, ___) => const LoginScreen(),
         transitionsBuilder: (_, animation, __, child) {
           return FadeTransition(opacity: animation, child: child);
         },
