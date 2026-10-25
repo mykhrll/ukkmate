@@ -32,6 +32,8 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **v0.1.6** | Pasca-UTS | Perbaikan kegagalan build APK di Windows (`kotlin.incremental=false`), penghentian daemon pengunci file, konfigurasi `minSdk 21`, dan optimasi kompilasi `assembleRelease`. |
 | **v0.1.7** | Pasca-UTS | Integrasi galeri visual 19 mockup UI aplikasi ke `README.md`, penambahan logo header terpusat, pengelompokan alur antarmuka komprehensif, dan sinkronisasi versi aplikasi. |
 | **v0.1.8** | Minggu 6 | Penyempurnaan video splash screen murni sinematik: penghapusan kedipan splash screen lama (fallback UI), penghapusan tombol lewati & overlay branding footer, serta inisiasi progres Minggu ke 6. |
+| **v0.1.9** | Minggu 6 | Dukungan debugging web browser Google Chrome: inisialisasi timer independen anti-stuck, penyesuaian Chrome Autoplay Policy (`volume 0`), CSS styling background di `index.html`, isolasi platform channel web, dan frame preview responsif (`maxWidth: 480`). |
+
 
 
 
@@ -128,6 +130,16 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   - Menetapkan warna latar belakang layar menjadi `#0F1523` yang identik dengan tema video splash sehingga transisi antar-frame berjalan mulus tanpa kedipan.
   - Menyesuaikan berkas pengujian `test/widget_test.dart` dan menyinkronkan nomor versi ke `v0.1.8`.
 
+### 📅 Progres Minggu ke 6 (Rilis v0.1.9): Dukungan Debug Web Chrome & Kompatibilitas Antar-Platform
+- **Fokus Utama:** Memperbaiki galat saat proses debug dijalankan pada browser Google Chrome (`flutter run -d chrome`), di mana aplikasi sebelumnya *stuck* pada splash screen dan layar terbelah putih di sebelah kanan.
+- **Implementasi:**
+  - **Inisialisasi Timer Navigasi Independen:** Memindahkan inisialisasi `_navigationTimer` ke dalam `initState()` agar tidak terikat dengan status *completion* dari `VideoPlayerController.initialize()`. Dengan demikian, navigasi ke halaman login/onboarding dijamin 100% selalu berjalan lancar dan tidak pernah *freeze*.
+  - **Penyesuaian Autoplay Policy Browser:** Mengatur `await _controller!.setVolume(0.0)` khusus pada platform web (`kIsWeb`) sehingga Chrome tidak memblokir pemutaran video otomatis tanpa interaksi fisik pengguna.
+  - **Penanganan Batas Waktu (*Timeout*):** Menambahkan pembatas waktu `.timeout(const Duration(seconds: 2))` pada inisialisasi video controller untuk mencegah Future menggantung di lingkungan sandbox web.
+  - **Perbaikan CSS Background Web:** Menambahkan styling `background-color: #0F1523; width: 100%; height: 100%;` pada `web/index.html` untuk mengeliminasi area putih kosong di sebelah kanan canvas.
+  - **Frame Responsif Mobile-Optimized:** Menambahkan wrapper `builder` di `main.dart` berbasis `maxWidth: 480` yang terpusat rapi saat dijalankan di browser desktop, sehingga layout mobile-first tetap proporsional saat diuji di layar PC/laptop.
+  - **Isolasi Fitur Platform Native:** Membungkus platform channel `FLAG_SECURE` dan `SystemChrome` di `exam_session_screen.dart` dengan kondisi `if (!kIsWeb)`.
+
 ---
 
 ## 3. Pembagian Peran (Human vs AI Contribution)
@@ -139,6 +151,7 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **Mockup UI Figma** | Merancang seluruh mockup UI di Figma, menentukan layout, spacing, warna, dan flow navigasi antar-screen. | Mengimplementasikan desain dari referensi mockup ke kode Flutter. |
 | **Galeri Dokumentasi Visual Mockup** | Memberikan instruksi penambahan mockup yang tersimpan di direktori `assets/` ke dalam `README.md`. | Mengelompokkan 19 tangkapan layar antarmuka ke dalam 5 kategori alur logis serta menyusun tata letak galeri tabel responsif di GitHub. |
 | **Penyempurnaan Splash Sinematik (Minggu 6)** | Menginstruksikan penghapusan splash lama yang berkedip, tombol lewati, dan teks footer branding. | Merombak arsitektur `SplashScreen` menjadi pure video player dengan background matching dan membersihkan timer/overlay. |
+| **Dukungan Web Debug Chrome (Minggu 6)** | Melaporkan kendala saat debugging di Chrome (layar terbelah putih dan stuck) disertai screenshot browser. | Mendiagnosis video autoplay policy & async timer hanging di web, menambahkan CSS background, dan membuat mobile preview frame. |
 | **Video Splash Screen & Durasi 3–5s** | Menentukan durasi splash video 10 detik agar dipersingkat menjadi 3–5 detik dengan tombol lewati. | Mengimplementasikan kontrol `VideoPlayerController`, timer navigasi 3.8s, dan countdown UI. |
 | **Tutorial Pengguna Baru (Onboarding)** | Mengarahkan pembuatan panduan cara memakai aplikasi untuk pengguna pertama kali install. | Merancang `OnboardingTutorialScreen` dengan `PageView`, dot indicator, dan integrasi `SharedPreferences`. |
 | **Konfirmasi Kata Sandi & Validasi** | Mewajibkan input kata sandi 2 kali saat pendaftaran untuk mencegah kesalahan ketik pengguna. | Membuat field konfirmasi, *real-time match validator*, dan pengecekan form. |
@@ -200,6 +213,21 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   2. Menambahkan `kotlin.incremental=false` pada `android/gradle.properties`.
   3. Memastikan `minSdk` minimal 21 di `android/app/build.gradle.kts` untuk plugin video.
   4. Menjalankan pengujian build hingga menghasilkan `app-release.apk` (54.2 MB) dengan status sukses (`BUILD SUCCESSFUL`).
+
+---
+
+### Studi Kasus 5: Penanganan Galat Debugging Flutter Web di Google Chrome (Autoplay Policy & Async Timer Hanging)
+- **Tujuan / Instruksi (Prompt):**  
+  *"ini ketika saya run debug menggunakan chrome tidak bisa, tolong perbaiki walaupun niat saya untuk mengembangkan aplikasi ini nantinya itu dalam bentuk mobile dulu, mungkin nanti tunggu aplikasi ini sudah layak digunakan di mobile barulah saya akan buat di webapp nya juga" (disertai tangkapan layar browser Chrome di mana layar sebelah kiri gelap dan sebelah kanan putih kosong serta stuck).*
+- **Keluaran Awal / Diagnosa Masalah:**  
+  1. Pada Flutter Web, pemutaran video `VideoPlayerController.asset` bersuara (`setVolume(1.0)`) dicegah oleh *Chrome Autoplay Policy* yang melempar exception `DOMException: play() failed because the user didn't interact with the document first`.
+  2. Inisialisasi `_navigationTimer` sebelumnya diletakkan setelah baris `await _controller!.initialize()`. Jika inisialisasi decoding video di web menggantung (*unresolved Future*), maka timer navigasi tidak pernah terpicu sehingga aplikasi *freeze* selamanya di splash screen.
+  3. Berkas `web/index.html` tidak memiliki styling latar belakang default sehingga sisi kanan layar di luar area canvas video tampil sebagai warna putih polos (*split-screen effect*).
+- **Tindakan & Solusi:**  
+  1. Memindahkan pemicuan `_navigationTimer` ke dalam `initState()` secara independen dari video controller, dengan durasi 2.5 detik pada web dan 3.8 detik pada mobile.
+  2. Mengatur volume video ke `0.0` pada web (`kIsWeb`) dan menambahkan batas waktu inisialisasi `.timeout(const Duration(seconds: 2))`.
+  3. Menambahkan styling CSS `background-color: #0F1523` pada `web/index.html` agar seluruh viewport browser berwarna gelap seragam sejak proses bootstrapping.
+  4. Menambahkan wrapper responsif `maxWidth: 480` di `main.dart` agar tampilan mobile-first terpusat elegan saat diuji di layar desktop browser.
 
 ---
 

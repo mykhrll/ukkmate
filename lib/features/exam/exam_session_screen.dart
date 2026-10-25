@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ukkmate/core/theme/app_colors.dart';
@@ -20,15 +21,19 @@ class _ExamSessionScreenState extends State<ExamSessionScreen> {
   @override
   void initState() {
     super.initState();
-    // Enable FLAG_SECURE to prevent screenshots and screen recording
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    _enableSecureMode();
+    // Enable FLAG_SECURE on mobile platforms
+    if (!kIsWeb) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      _enableSecureMode();
+    }
   }
 
   @override
   void dispose() {
     // Disable FLAG_SECURE when leaving exam
-    _disableSecureMode();
+    if (!kIsWeb) {
+      _disableSecureMode();
+    }
     super.dispose();
   }
 

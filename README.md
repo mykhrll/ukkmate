@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.1.8 (Penyempurnaan Splash Screen Sinematik & Masuk Progres Minggu ke 6)  
+> **Versi Aplikasi:** v0.1.9 (Dukungan Web Debug Chrome & Penyempurnaan Splash Screen)  
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -110,6 +110,13 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 11. **Galeri Dokumentasi Visual UI Mockup (v0.1.7):**
     - Integrasi lengkap 19 tangkapan layar mockup visual pada dokumentasi repositori GitHub (`README.md`).
     - Penyajian terstruktur mencakup seluruh alur: Autentikasi, Dashboard Siswa, Simulasi CBT, Hasil Penilaian, Riwayat Analitik, Profil Biodata, hingga Portal Guru Pendamping & Penguji Asesor.
+
+12. **Dukungan Debug Web Browser Chrome (v0.1.9):**
+    - Mengatasi masalah *stuck* splash screen di Chrome dengan inisialisasi timer independen dan penanganan batas waktu (*timeout*) decoding video.
+    - Menyesuaikan *Autoplay Policy* browser Google Chrome dengan otomatisasi pembisuan audio (`setVolume(0.0)`) saat dijalankan di platform web.
+    - Mencegah tampilan layar terbelah putih di browser melalui styling CSS `background-color: #0F1523` pada `web/index.html`.
+    - Menyediakan *Mobile-Optimized Preview Frame* terpusat (`maxWidth: 480`) di desktop browser agar layout mobile dapat di-debug dengan proporsional dan nyaman.
+
 
 
 ---

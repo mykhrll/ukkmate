@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
@@ -21,15 +22,33 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Timer navigasi diinisialisasi independen sejak awal agar tidak pernah stuck di web maupun mobile
+    const splashDuration = kIsWeb
+        ? Duration(milliseconds: 2500)
+        : Duration(milliseconds: 3800);
+
+    _navigationTimer = Timer(splashDuration, () {
+      _navigateNext();
+    });
+
     _initializeVideo();
   }
 
   Future<void> _initializeVideo() async {
     try {
       _controller = VideoPlayerController.asset('assets/splash-screen.mp4');
-      await _controller!.initialize();
+      // Berikan batas waktu inisialisasi agar di web tidak pernah hang jika decoder lokal lambat
+      await _controller!.initialize().timeout(const Duration(seconds: 2));
       await _controller!.setLooping(false);
-      await _controller!.setVolume(1.0);
+
+      if (kIsWeb) {
+        // Autoplay policy browser mewajibkan volume 0 agar video diizinkan diputar otomatis tanpa interaksi pengguna
+        await _controller!.setVolume(0.0);
+      } else {
+        await _controller!.setVolume(1.0);
+      }
+
       await _controller!.play();
 
       if (mounted) {
@@ -38,13 +57,8 @@ class _SplashScreenState extends State<SplashScreen> {
         });
       }
     } catch (e) {
-      debugPrint('[SplashScreen] Video failed to load: $e');
+      debugPrint('[SplashScreen] Video failed to load (falling back gracefully): $e');
     }
-
-    // Durasi tayang splash video: 3.8 detik (rentang 3-5 detik)
-    _navigationTimer = Timer(const Duration(milliseconds: 3800), () {
-      _navigateNext();
-    });
   }
 
   Future<void> _navigateNext() async {
@@ -52,7 +66,9 @@ class _SplashScreenState extends State<SplashScreen> {
     _hasNavigated = true;
 
     _navigationTimer?.cancel();
-    _controller?.pause();
+    try {
+      _controller?.pause();
+    } catch (_) {}
 
     final prefs = await SharedPreferences.getInstance();
     final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
@@ -78,7 +94,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void dispose() {
     _navigationTimer?.cancel();
-    _controller?.dispose();
+    try {
+      _controller?.dispose();
+    } catch (_) {}
     super.dispose();
   }
 
@@ -92,9 +110,29 @@ class _SplashScreenState extends State<SplashScreen> {
                 aspectRatio: _controller!.value.aspectRatio,
                 child: VideoPlayer(_controller!),
               )
-            : const SizedBox.shrink(),
+            : _buildFallbackOrWebView(),
+      ),
+    );
+  }
+
+  Widget _buildFallbackOrWebView() {
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Image.asset(
+          'assets/logo.jpeg',
+          width: 100,
+          height: 100,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => const Icon(
+            Icons.school_rounded,
+            size: 80,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
 }
+
 
