@@ -8,7 +8,7 @@ import 'package:ukkmate/features/exam/exam_session_screen.dart';
 import 'package:ukkmate/features/tugas/tugas_screen.dart';
 import 'package:ukkmate/features/materi/materi_screen.dart';
 import 'package:ukkmate/features/bantuan/bantuan_screen.dart';
-import 'package:ukkmate/features/navigation/main_navigation.dart';
+import 'package:ukkmate/features/latihan/latihan_mandiri_screen.dart';
 import 'package:ukkmate/core/utils/date_formatter.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -196,11 +196,10 @@ class HomeScreen extends StatelessWidget {
           icon: Icons.edit_note,
           color: AppColors.warningOrange,
           onTap: () {
-            if (onNavigateTab != null) {
-              onNavigateTab!(1);
-            } else {
-              MainNavigation.switchTab(context, 1);
-            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LatihanMandiriScreen()),
+            );
           },
         ),
         MenuCard(

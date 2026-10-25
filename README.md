@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.3 (Panduan Interaktif Popup Menu Pasca-Login & Direct Splash Navigation)  
+> **Versi Aplikasi:** v0.2.4 (Antarmuka Khusus Latihan Mandiri & Desain Sub-Menu Terpadu)  
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -56,7 +56,7 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.3)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.4)
 
 1. **Video Splash Screen Sinematik 3 Detik Penuh (v0.2.0):**
    - Menampilkan berkas video animasi resolusi tinggi `assets/splash-screen.mp4` baru yang telah dipersingkat dan dioptimalkan menjadi tepat 3 detik.
@@ -134,9 +134,10 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
     - Dilengkapi kontrol langkah (*Kembali*, *Lanjut*, *Lewati*, *Mulai Jelajahi*), transisi pergantian tab otomatis secara *real-time*, dan opsi membuka kembali tur kapan saja dari menu Profil Siswa maupun Pengaturan Guru.
     - Splash screen kini langsung mengarahkan pengguna ke portal masuk (`LoginScreen`) secara mulus tanpa interupsi.
 
-
-
-
+16. **Antarmuka Khusus Latihan Mandiri & Desain Sub-Menu Terpadu (v0.2.4):**
+    - Memisahkan alur kartu grid *Latihan Mandiri* di dashboard siswa dari navigasi tab bar bawah, menggantikannya dengan halaman mandiri tersendiri (`LatihanMandiriScreen`).
+    - Menyelaraskan tata letak header sub-menu dengan modul lainnya (`TugasScreen` & `MateriScreen`), dilengkapi tombol kembali (`arrow_back`), logo resmi UKKMate, judul sub-menu `UKKMATE CBT`, indikator status *Tersinkron*, dan foto profil asesi.
+    - Dilengkapi fitur pendukung belajar mandiri: kartu target harian siswa, pemilihan 3 mode latihan (Drill Kilat, Studi Kasus, Uji Waktu), filter chip kategori kompetensi interaktif, daftar paket soal studi kasus terarah, serta kartu tips belajar sukses UKK.
 
 ---
 

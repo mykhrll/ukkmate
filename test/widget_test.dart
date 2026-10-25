@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ukkmate/main.dart';
 import 'package:ukkmate/features/splash/splash_screen.dart';
 import 'package:ukkmate/features/navigation/main_navigation.dart';
+import 'package:ukkmate/features/latihan/latihan_mandiri_screen.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -58,5 +59,27 @@ void main() {
 
     // Verify tour dismissed
     expect(find.text('PANDUAN DASAR • 2 DARI 5'), findsNothing);
+  });
+
+  testWidgets('LatihanMandiriScreen menampilkan header sub-menu standar dan elemen interaktif', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: LatihanMandiriScreen(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify header elements
+    expect(find.text('UKKMATE CBT'), findsOneWidget);
+    expect(find.text('Latihan Mandiri'), findsOneWidget);
+    expect(find.text('Tersinkron'), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+
+    // Verify sections
+    expect(find.text('Mode Latihan Mandiri'), findsOneWidget);
+    expect(find.text('Paket Soal Latihan Mandiri'), findsOneWidget);
+    expect(find.text('Tips Sukses Latihan Mandiri'), findsOneWidget);
   });
 }
