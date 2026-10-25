@@ -16,7 +16,6 @@ void main() {
 
     // Verify splash screen is displayed
     expect(find.byType(SplashScreen), findsOneWidget);
-    expect(find.textContaining('UKKMate'), findsWidgets);
 
     // Advance timer past splash duration (4 seconds)
     await tester.pump(const Duration(seconds: 4));

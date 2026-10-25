@@ -31,6 +31,8 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **v0.1.5 (Progres 5)** | Pasca-UTS | Video splash screen (3-5s), tutorial pengguna baru (onboarding walkthrough), konfirmasi kata sandi pendaftaran, login/daftar akun Google, fitur lupa kata sandi via email, direct access tab Kelas untuk guru, UI Pengaturan Guru lengkap, implementasi UI interaktif Chat Bot AI, pembersihan data demo, dan penyesuaian tanggal dinamis (WIB). |
 | **v0.1.6** | Pasca-UTS | Perbaikan kegagalan build APK di Windows (`kotlin.incremental=false`), penghentian daemon pengunci file, konfigurasi `minSdk 21`, dan optimasi kompilasi `assembleRelease`. |
 | **v0.1.7** | Pasca-UTS | Integrasi galeri visual 19 mockup UI aplikasi ke `README.md`, penambahan logo header terpusat, pengelompokan alur antarmuka komprehensif, dan sinkronisasi versi aplikasi. |
+| **v0.1.8** | Minggu 6 | Penyempurnaan video splash screen murni sinematik: penghapusan kedipan splash screen lama (fallback UI), penghapusan tombol lewati & overlay branding footer, serta inisiasi progres Minggu ke 6. |
+
 
 
 ---
@@ -117,6 +119,15 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
     5. *Portal Khusus Guru Pendamping & Penguji* (Dashboard Guru, Manajemen Kelas Binaan, Distribusi Bank Soal, Pengaturan Guru).
   - Sinkronisasi nomor versi aplikasi menjadi `v0.1.7` di seluruh titik antarmuka (`pubspec.yaml`, `profile_screen.dart`, dan `guru_pengaturan_screen.dart`).
 
+### 📅 Progres Minggu ke 6 (Rilis v0.1.8): Penyempurnaan Video Splash Screen Murni & Sinematik
+- **Fokus Utama:** Menghilangkan residu UI splash screen lama dan overlay yang mengganggu pengalaman visual pembuka aplikasi, sehingga video splash screen tampil 100% murni, bersih, dan sinematik.
+- **Implementasi:**
+  - Menghapus komponen fallback UI splash screen lama (`_buildFallbackSplash()`) yang sebelumnya sempat muncul sepersekian detik sebelum inisialisasi video selesai (menghapus kotak logo lama, linear loader, dan teks 'Memuat UKKMate...').
+  - Menghilangkan tombol lewati (*skip countdown button*) `Lewati (x) >` di pojok kanan atas beserta timer hitung mundurnya.
+  - Menghapus teks branding footer `UKKMate • Standar Asesmen Kejuruan SMK` di bagian bawah layar.
+  - Menetapkan warna latar belakang layar menjadi `#0F1523` yang identik dengan tema video splash sehingga transisi antar-frame berjalan mulus tanpa kedipan.
+  - Menyesuaikan berkas pengujian `test/widget_test.dart` dan menyinkronkan nomor versi ke `v0.1.8`.
+
 ---
 
 ## 3. Pembagian Peran (Human vs AI Contribution)
@@ -127,6 +138,7 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **Desain Sistem & Brand Identity** | Menentukan palet warna dari logo utama (`#161A29`, `#135CE2`, `#23B26D`, `#F99E15`), menolak latar putih polos dan meminta latar *soft slate-blue* (`#EFF3FA`). | Mengenerate kelas konstanta warna (`AppColors`) dan `AppTextStyles`. |
 | **Mockup UI Figma** | Merancang seluruh mockup UI di Figma, menentukan layout, spacing, warna, dan flow navigasi antar-screen. | Mengimplementasikan desain dari referensi mockup ke kode Flutter. |
 | **Galeri Dokumentasi Visual Mockup** | Memberikan instruksi penambahan mockup yang tersimpan di direktori `assets/` ke dalam `README.md`. | Mengelompokkan 19 tangkapan layar antarmuka ke dalam 5 kategori alur logis serta menyusun tata letak galeri tabel responsif di GitHub. |
+| **Penyempurnaan Splash Sinematik (Minggu 6)** | Menginstruksikan penghapusan splash lama yang berkedip, tombol lewati, dan teks footer branding. | Merombak arsitektur `SplashScreen` menjadi pure video player dengan background matching dan membersihkan timer/overlay. |
 | **Video Splash Screen & Durasi 3–5s** | Menentukan durasi splash video 10 detik agar dipersingkat menjadi 3–5 detik dengan tombol lewati. | Mengimplementasikan kontrol `VideoPlayerController`, timer navigasi 3.8s, dan countdown UI. |
 | **Tutorial Pengguna Baru (Onboarding)** | Mengarahkan pembuatan panduan cara memakai aplikasi untuk pengguna pertama kali install. | Merancang `OnboardingTutorialScreen` dengan `PageView`, dot indicator, dan integrasi `SharedPreferences`. |
 | **Konfirmasi Kata Sandi & Validasi** | Mewajibkan input kata sandi 2 kali saat pendaftaran untuk mencegah kesalahan ketik pengguna. | Membuat field konfirmasi, *real-time match validator*, dan pengecekan form. |

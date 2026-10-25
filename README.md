@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.1.7 (Galeri Visual Mockup & Showcase UI Antarmuka)  
+> **Versi Aplikasi:** v0.1.8 (Penyempurnaan Splash Screen Sinematik & Masuk Progres Minggu ke 6)  
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -56,12 +56,13 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5, v0.1.6 & v0.1.7)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.1.8)
 
-1. **Video Splash Screen Interaktif (3–5 Detik):**
-   - Menampilkan animasi video splash screen beresolusi tinggi (`assets/splash-screen.mp4`).
-   - Durasi pemutaran otomatis dibatasi 3.8 detik (menyesuaikan performa dan spesifikasi perangkat).
-   - Dilengkapi tombol interaktif **"Lewati"** dengan indikator *countdown timer* di pojok kanan atas serta *graceful fallback* logo animasi untuk perangkat berspesifikasi rendah.
+1. **Video Splash Screen Murni & Sinematik (v0.1.8):**
+   - Menampilkan animasi video splash screen resolusi tinggi (`assets/splash-screen.mp4`) secara mulus (*seamless*) dengan transisi layar yang bersih.
+   - Menghapus tampilan splash screen lama (logo kotak, indikator progres, dan teks 'Memuat UKKMate...'), menghilangkan tombol lewati di pojok kanan atas, serta membersihkan teks footer branding agar tampilan splash sepenuhnya bersih dan berfokus pada video pembuka.
+   - Durasi pemutaran terukur 3.8 detik dan otomatis beralih ke onboarding tutorial atau portal login terpadu.
+
 
 2. **Panduan & Tutorial Aplikasi (Onboarding Walkthrough):**
    - Ditampilkan otomatis saat pertama kali pengguna menginstal dan membuka aplikasi (tersimpan via `SharedPreferences`).
