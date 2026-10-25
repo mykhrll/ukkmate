@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.0 (Video Splash Screen 3 Detik Penuh & Penyelesaian Splash Minggu ke 6)  
+> **Versi Aplikasi:** v0.2.1 (Perbaikan Cross-Drive Gradle Build di Windows & Stabilisasi IDE)  
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -117,6 +117,12 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
     - Menyesuaikan *Autoplay Policy* browser Google Chrome dengan otomatisasi pembisuan audio (`setVolume(0.0)`) saat dijalankan di platform web.
     - Mencegah tampilan layar terbelah putih di browser melalui styling CSS `background-color: #0F1523` pada `web/index.html`.
     - Menyediakan *Mobile-Optimized Preview Frame* terpusat (`maxWidth: 480`) di desktop browser agar layout mobile dapat di-debug dengan proporsional dan nyaman.
+
+13. **Resolusi Cross-Drive Path Gradle di Windows (v0.2.1):**
+    - Memperbaiki galat `this and base files have different roots` pada Gradle saat proyek berada di drive berbeda (Drive D:) dari cache paket Pub (`C:\Users\...\AppData\Local\Pub\Cache`).
+    - Memperbarui `android/build.gradle.kts` dengan validasi kecocokan drive root sebelum mengubah `buildDirectory` subproyek plugin pihak ketiga.
+    - Menjamin kelancaran inspeksi ekstensi IDE Gradle for Java serta kompilasi APK debug/release secara mulus tanpa kegagalan task.
+
 
 
 

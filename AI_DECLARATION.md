@@ -34,6 +34,8 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **v0.1.8** | Minggu 6 | Penyempurnaan video splash screen murni sinematik: penghapusan kedipan splash screen lama (fallback UI), penghapusan tombol lewati & overlay branding footer, serta inisiasi progres Minggu ke 6. |
 | **v0.1.9** | Minggu 6 | Dukungan debugging web browser Google Chrome: inisialisasi timer independen anti-stuck, penyesuaian Chrome Autoplay Policy (`volume 0`), CSS styling background di `index.html`, isolasi platform channel web, dan frame preview responsif (`maxWidth: 480`). |
 | **v0.2.0** | Minggu 6 | Implementasi pemutaran penuh video splash screen 3 detik (`assets/splash-screen.mp4`) hingga selesai tanpa dipotong (*video completion listener*), buffer timer toleransi dinamis, dan penyelesaian modul splash Minggu ke 6. |
+| **v0.2.1** | Minggu 6 | Perbaikan galat Gradle build `this and base files have different roots` di Windows akibat pemisahan drive proyek (Drive D:) dan Pub Cache (Drive C:) melalui pengecekan drive root pada `android/build.gradle.kts`. |
+
 
 
 
@@ -150,6 +152,14 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   - Menambahkan buffer toleransi fallback dinamis `duration + 300ms` untuk memastikan navigasi tetap terjamin 100% jika terjadi keterlambatan decoding frame di lingkungan perangkat tertentu.
   - Sinkronisasi versi aplikasi ke `v0.2.0+12`.
 
+### 📅 Progres Minggu ke 6 (Rilis v0.2.1): Resolusi Cross-Drive Path Gradle di Windows & Stabilisasi IDE
+- **Fokus Utama:** Menyelesaikan kegagalan inspeksi Gradle build pada IDE (`Could not create task ':shared_preferences_android:compileDebugUnitTestSources'. > this and base files have different roots`) yang terjadi karena pemisahan drive antara proyek (Drive D:) dan pub cache (Drive C:).
+- **Implementasi:**
+  - Menambahkan pengecekan kesamaan drive root (`projectRoot == rootProjectRoot`) pada blok konfigurasi `subprojects` di berkas `android/build.gradle.kts`.
+  - Mengizinkan plugin Flutter di pub cache menggunakan direktori build standarnya sendiri sehingga operasi Java path relativization antar file selalu berada di drive yang sama.
+  - Pengujian eksekusi `gradlew tasks` dan `flutter build apk --debug` terverifikasi sukses 100% tanpa galat.
+  - Sinkronisasi versi aplikasi ke `v0.2.1+13`.
+
 ---
 
 ## 3. Pembagian Peran (Human vs AI Contribution)
@@ -163,6 +173,7 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | **Penyempurnaan Splash Sinematik (Minggu 6)** | Menginstruksikan penghapusan splash lama yang berkedip, tombol lewati, dan teks footer branding. | Merombak arsitektur `SplashScreen` menjadi pure video player dengan background matching dan membersihkan timer/overlay. |
 | **Dukungan Web Debug Chrome (Minggu 6)** | Melaporkan kendala saat debugging di Chrome (layar terbelah putih dan stuck) disertai screenshot browser. | Mendiagnosis video autoplay policy & async timer hanging di web, menambahkan CSS background, dan membuat mobile preview frame. |
 | **Video Splash 3 Detik Utuh (Minggu 6)** | Memperbarui berkas `assets/splash-screen.mp4` menjadi tepat 3 detik dan meminta video ditampilkan hingga selesai tanpa dipotong. | Mengimplementasikan `video completion listener` reaktif (`position >= duration`) dengan toleransi buffer dinamis. |
+| **Resolusi Cross-Drive Gradle Windows (Minggu 6)** | Melaporkan log galat terminal Gradle for Java (`this and base files have different roots: D:\ and C:\`). | Menganalisis batasan path relativization multi-drive di Windows, memvalidasi drive root di `build.gradle.kts`, dan memverifikasi build debug APK. |
 | **Video Splash Screen & Durasi 3–5s** | Menentukan durasi splash video 10 detik agar dipersingkat menjadi 3–5 detik dengan tombol lewati. | Mengimplementasikan kontrol `VideoPlayerController`, timer navigasi 3.8s, dan countdown UI. |
 | **Tutorial Pengguna Baru (Onboarding)** | Mengarahkan pembuatan panduan cara memakai aplikasi untuk pengguna pertama kali install. | Merancang `OnboardingTutorialScreen` dengan `PageView`, dot indicator, dan integrasi `SharedPreferences`. |
 | **Konfirmasi Kata Sandi & Validasi** | Mewajibkan input kata sandi 2 kali saat pendaftaran untuk mencegah kesalahan ketik pengguna. | Membuat field konfirmasi, *real-time match validator*, dan pengecekan form. |
@@ -239,6 +250,20 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   2. Mengatur volume video ke `0.0` pada web (`kIsWeb`) dan menambahkan batas waktu inisialisasi `.timeout(const Duration(seconds: 2))`.
   3. Menambahkan styling CSS `background-color: #0F1523` pada `web/index.html` agar seluruh viewport browser berwarna gelap seragam sejak proses bootstrapping.
   4. Menambahkan wrapper responsif `maxWidth: 480` di `main.dart` agar tampilan mobile-first terpusat elegan saat diuji di layar desktop browser.
+
+---
+
+### Studi Kasus 6: Penanganan Galat Gradle Build Cross-Drive Path di Windows (`this and base files have different roots`)
+- **Tujuan / Instruksi (Prompt):**  
+  *"itu kenapa gradle build error ya, coba perbaiki" (disertai log terminal ekstensi Gradle for Java di mana eksekusi task gagal dengan exception "Could not create task ':shared_preferences_android:compileDebugUnitTestSources'. > this and base files have different roots: D:\Coding\Flutter\ukkmate\build\shared_preferences_android and C:\Users\muham\AppData\Local\Pub\Cache\hosted\pub.dev\shared_preferences_android-2.4.28\android").*
+- **Keluaran Awal / Diagnosa Masalah:**  
+  1. Pada sistem operasi Windows, proyek aplikasi UKKMate berada di Drive `D:` (`D:\Coding\Flutter\ukkmate`), sedangkan seluruh paket pustaka (Pub Cache) tersimpan secara default di Drive `C:` (`C:\Users\muham\AppData\Local\Pub\Cache`).
+  2. Blok konfigurasi `subprojects` di `android/build.gradle.kts` secara agresif memaksa seluruh `buildDirectory` subproyek (termasuk modul plugin yang berada di Drive C:) ke dalam direktori build aplikasi di Drive D:.
+  3. Saat Gradle 9.x dan Android Gradle Plugin membuat task `compileDebugUnitTestSources`, Gradle memanggil `Path.relativize()` antara file base dan file target. Karena kedua file memiliki drive root yang berbeda (D: vs C:), Java melempar `IllegalArgumentException: this and base files have different roots`.
+- **Tindakan & Solusi:**  
+  1. Menambahkan validasi drive root `projectRoot == rootProjectRoot` di `android/build.gradle.kts` sebelum memodifikasi `buildDirectory` subproyek.
+  2. Membiarkan subproyek plugin pihak ketiga menggunakan direktori build standarnya sendiri sehingga operasi path relativization selalu berada dalam drive yang sama.
+  3. Memverifikasi eksekusi `.\gradlew.bat tasks` dan kompilasi APK (`flutter build apk --debug`) hingga keduanya berhasil 100% (*BUILD SUCCESSFUL*).
 
 ---
 
