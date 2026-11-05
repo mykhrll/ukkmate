@@ -32,16 +32,16 @@ class DefaultFirebaseOptions {
     projectId: 'ukkmate',
     storageBucket: 'ukkmate.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAyI86QgvDZscL8CNAvrHXM2EBECeYqrik',
     appId: '1:318721086619:ios:94f26ab453c2092ef9e23e',
     messagingSenderId: '318721086619',
     projectId: 'ukkmate',
     storageBucket: 'ukkmate.firebasestorage.app',
+    androidClientId: '318721086619-8fcs1queafefgi246kr6be0sdjcb7tfi.apps.googleusercontent.com',
+    iosClientId: '318721086619-3ndkfeaalfktpneiva8gf4lpb0gsesr7.apps.googleusercontent.com',
     iosBundleId: 'com.example.ukkmate',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'REPLACE_WITH_MACOS_API_KEY',
     appId: 'REPLACE_WITH_MACOS_APP_ID',

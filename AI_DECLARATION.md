@@ -6,7 +6,7 @@
 **NPM:** 2413025012  
 **Program Studi:** Pendidikan Teknologi Informasi  
 **Judul Aplikasi:** UKKMate: Aplikasi Simulasi dan Bank Soal Uji Kompetensi Keahlian untuk Siswa SMK  
-**Versi Saat Ini:** v0.2.5 (Konfigurasi Firebase Android, iOS, dan Web)
+**Versi Saat Ini:** v0.2.6 (Konfigurasi Firebase dan Google Sign-In)
 **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -190,6 +190,15 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   - Menempatkan `GoogleService-Info.plist` pada `ios/Runner/` dan menyamakan Bundle ID `com.example.ukkmate`.
   - Mengonfigurasi Firebase Hosting untuk menggunakan hasil build Flutter Web pada `build/web`.
   - Build native iOS belum dapat diverifikasi pada Windows dan masih memerlukan macOS/Xcode.
+
+### 📅 Integrasi Google Sign-In (Rilis v0.2.6): FlutterFire CLI dan OAuth
+- **Fokus Utama:** Menyinkronkan konfigurasi Firebase Android, iOS, dan Web serta menyiapkan Google Sign-In.
+- **Implementasi:**
+  - Mengaktifkan `flutterfire_cli` dan membuat ulang `lib/firebase_options.dart` untuk project `ukkmate`.
+  - Menyegarkan OAuth client IDs pada konfigurasi Android dan iOS; SHA-1 debug Android sudah terdaftar di Firebase.
+  - Menjalankan `flutter pub get`, `flutter analyze`, `flutter test`, dan `flutter build apk --debug` dengan hasil berhasil.
+  - Uji login Google di perangkat belum dilakukan karena tidak ada emulator atau perangkat Android terhubung.
+  - Sinkronisasi versi aplikasi ke `v0.2.6+18`.
 
 ---
 
