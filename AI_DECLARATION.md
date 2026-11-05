@@ -6,7 +6,7 @@
 **NPM:** 2413025012  
 **Program Studi:** Pendidikan Teknologi Informasi  
 **Judul Aplikasi:** UKKMate: Aplikasi Simulasi dan Bank Soal Uji Kompetensi Keahlian untuk Siswa SMK  
-**Versi Saat Ini:** v0.2.5 (Aturan Otomatis Git, Dokumentasi, & Kenaikan Versi Bertahap)  
+**Versi Saat Ini:** v0.2.5 (Konfigurasi Firebase Android, iOS, dan Web)
 **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -182,6 +182,14 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   - Menyertakan kartu tips belajar mandiri sukses UKK untuk meningkatkan motivasi dan kesiapan asesi.
   - Mengubah aksi `onTap` pada kartu grid "Latihan Mandiri" di `HomeScreen` dari `MainNavigation.switchTab(context, 1)` menjadi `Navigator.push(context, MaterialPageRoute(builder: (_) => const LatihanMandiriScreen()))`.
   - Sinkronisasi versi aplikasi ke `v0.2.4+16`.
+
+### 📅 Integrasi Firebase (Rilis v0.2.5): Konfigurasi Android, iOS, dan Web
+- **Fokus Utama:** Menyiapkan konfigurasi Firebase lintas platform pada aplikasi Flutter UKKMate.
+- **Implementasi:**
+  - Menambahkan konfigurasi Firebase Android dan iOS berdasarkan berkas konfigurasi dari Firebase Console, serta menggunakan `DefaultFirebaseOptions` saat inisialisasi.
+  - Menempatkan `GoogleService-Info.plist` pada `ios/Runner/` dan menyamakan Bundle ID `com.example.ukkmate`.
+  - Mengonfigurasi Firebase Hosting untuk menggunakan hasil build Flutter Web pada `build/web`.
+  - Build native iOS belum dapat diverifikasi pada Windows dan masih memerlukan macOS/Xcode.
 
 ---
 

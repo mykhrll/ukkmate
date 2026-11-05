@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.5 (Aturan Otomatis Git, Dokumentasi, & Kenaikan Versi Bertahap)  
+> **Versi Aplikasi:** v0.2.5  
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -56,7 +56,7 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.4)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.5)
 
 1. **Video Splash Screen Sinematik 3 Detik Penuh (v0.2.0):**
    - Menampilkan berkas video animasi resolusi tinggi `assets/splash-screen.mp4` baru yang telah dipersingkat dan dioptimalkan menjadi tepat 3 detik.
@@ -197,6 +197,11 @@ lib/
    ```bash
    flutter pub get
    ```
+
+### Konfigurasi Firebase iOS
+- Untuk Flutter, gunakan paket Firebase di `pubspec.yaml`; jangan menambahkan Firebase iOS SDK secara manual lewat Swift Package Manager.
+- Letakkan `GoogleService-Info.plist` di `ios/Runner/` dan pastikan Bundle ID sama dengan yang didaftarkan di Firebase.
+- Build dan validasi iOS memerlukan macOS dengan Xcode; konfigurasi Flutter saja belum membuktikan build native berhasil.
 
 3. **Verifikasi kesehatan kode & pengujian:**
    ```bash
