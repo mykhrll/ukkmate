@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.4 (Antarmuka Khusus Latihan Mandiri & Desain Sub-Menu Terpadu)  
+> **Versi Aplikasi:** v0.2.5 (Aturan Otomatis Git, Dokumentasi, & Kenaikan Versi Bertahap)  
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---

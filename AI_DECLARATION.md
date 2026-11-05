@@ -6,7 +6,7 @@
 **NPM:** 2413025012  
 **Program Studi:** Pendidikan Teknologi Informasi  
 **Judul Aplikasi:** UKKMate: Aplikasi Simulasi dan Bank Soal Uji Kompetensi Keahlian untuk Siswa SMK  
-**Versi Saat Ini:** v0.2.4 (Antarmuka Khusus Latihan Mandiri & Desain Sub-Menu Terpadu)  
+**Versi Saat Ini:** v0.2.5 (Aturan Otomatis Git, Dokumentasi, & Kenaikan Versi Bertahap)  
 **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
