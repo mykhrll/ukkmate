@@ -17,9 +17,10 @@ class BackendConfig {
   final String primaryBackend = 'Supabase Database & Auth';
   final String secondaryBackend = 'Firebase Cloud Messaging & Analytics';
 
-  /// Supabase Configuration Placeholders (to be configured in backend phase)
-  String supabaseUrl = 'https://your-project-id.supabase.co';
-  String supabaseAnonKey = 'your-anon-key';
+  /// Supabase client configuration. Keep RLS enabled for exposed tables.
+  String supabaseUrl = 'https://hdqsxljcxlzbqqgpslgn.supabase.co';
+  String supabasePublishableKey =
+      'sb_publishable_QtZoSy-6HqOHeTi0hO0A0A_QhOKu2xe';
 
   /// Firebase Project ID Placeholder
   String firebaseProjectId = 'ukkmate-smk-official';
@@ -43,7 +44,9 @@ class BackendConfig {
   Future<Map<String, dynamic>> signInWithGoogle() async {
     await Future.delayed(const Duration(milliseconds: 1200));
 
-    debugPrint('[BackendService] Initiating Google Sign-In with Firebase/Supabase...');
+    debugPrint(
+      '[BackendService] Initiating Google Sign-In with Firebase/Supabase...',
+    );
     return {
       'success': true,
       'email': 'siswa.smk@belajar.id',

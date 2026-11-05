@@ -6,7 +6,7 @@
 **NPM:** 2413025012  
 **Program Studi:** Pendidikan Teknologi Informasi  
 **Judul Aplikasi:** UKKMate: Aplikasi Simulasi dan Bank Soal Uji Kompetensi Keahlian untuk Siswa SMK  
-**Versi Saat Ini:** v0.2.6 (Konfigurasi Firebase dan Google Sign-In)
+**Versi Saat Ini:** v0.2.7 (Konfigurasi Supabase client)
 **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -199,6 +199,12 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
   - Menjalankan `flutter pub get`, `flutter analyze`, `flutter test`, dan `flutter build apk --debug` dengan hasil berhasil.
   - Uji login Google di perangkat belum dilakukan karena tidak ada emulator atau perangkat Android terhubung.
   - Sinkronisasi versi aplikasi ke `v0.2.6+18`.
+
+### 📅 Konfigurasi Supabase Client (Rilis v0.2.7)
+- Menyimpan Project URL dan publishable key pada `BackendConfig` untuk penggunaan client Flutter.
+- Tidak menyimpan service-role atau secret API key di aplikasi client.
+- Integrasi Supabase runtime, dependency Flutter, dan policy RLS masih perlu disiapkan terpisah.
+- Sinkronisasi versi aplikasi ke `v0.2.7+19`.
 
 ---
 

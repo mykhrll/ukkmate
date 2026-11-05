@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.6
+> **Versi Aplikasi:** v0.2.7
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -56,7 +56,7 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.6)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.7)
 
 1. **Video Splash Screen Sinematik 3 Detik Penuh (v0.2.0):**
    - Menampilkan berkas video animasi resolusi tinggi `assets/splash-screen.mp4` baru yang telah dipersingkat dan dioptimalkan menjadi tepat 3 detik.
@@ -209,6 +209,11 @@ flutter pub get
 - Letakkan `GoogleService-Info.plist` di `ios/Runner/` dan pastikan Bundle ID sama dengan yang didaftarkan di Firebase.
 - Letakkan `google-services.json` di `android/app/`; setelah mengaktifkan Google Sign-In, unduh ulang konfigurasi Android dan iOS dari Firebase Console.
 - Build dan validasi iOS memerlukan macOS dengan Xcode; konfigurasi Flutter saja belum membuktikan build native berhasil.
+
+### Konfigurasi Supabase Flutter
+- Simpan Project URL dan publishable key di `BackendConfig`; publishable key memang ditujukan untuk aplikasi client.
+- Aktifkan Row Level Security (RLS) dan buat policy sebelum tabel diakses dari aplikasi.
+- Jangan pernah menaruh service-role atau secret API key di aplikasi Flutter atau repositori.
 
 3. **Verifikasi kesehatan kode & pengujian:**
    ```bash
