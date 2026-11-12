@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ukkmate/core/constants/app_version.dart';
 import 'package:ukkmate/core/theme/app_colors.dart';
 import 'package:ukkmate/core/theme/app_text_styles.dart';
 import 'package:ukkmate/core/utils/date_formatter.dart';
@@ -28,25 +29,36 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
     setState(() {
       _isSyncing = true;
     });
-
-    await Future.delayed(const Duration(milliseconds: 1400));
-
-    if (!mounted) return;
-
-    setState(() {
-      _isSyncing = false;
-      _lastSyncTime = DateFormatter.getCurrentTimeWib();
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Database Supabase & Firebase berhasil disinkronkan ($_lastSyncTime)!',
+    try {
+      final profile = await BackendConfig().getCurrentProfile();
+      if (profile == null) throw StateError('Sesi Supabase tidak aktif.');
+      final results = await Future.wait([
+        BackendConfig().fetchMaterials(),
+        BackendConfig().fetchTasks(),
+      ]);
+      if (!mounted) return;
+      setState(() => _lastSyncTime = DateFormatter.getCurrentTimeWib());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Supabase terhubung: ${results[0].length} materi, ${results[1].length} tugas.',
+          ),
+          backgroundColor: AppColors.primaryGreen,
+          behavior: SnackBarBehavior.floating,
         ),
-        backgroundColor: AppColors.primaryGreen,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Sinkronisasi gagal: $error'),
+          backgroundColor: AppColors.errorRed,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isSyncing = false);
+    }
   }
 
   void _showLogoutDialog() {
@@ -54,7 +66,9 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Row(
             children: [
               const Icon(Icons.logout, color: AppColors.errorRed),
@@ -77,7 +91,18 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                try {
+                  await BackendConfig().signOut();
+                } catch (error) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Gagal keluar: $error')),
+                    );
+                  }
+                  return;
+                }
+                if (!context.mounted) return;
                 Navigator.pop(context);
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -217,7 +242,10 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
                 ),
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2.5,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -382,7 +410,10 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
       child: Column(
         children: [
           SwitchListTile(
-            title: Text('Acak Urutan Butir Soal', style: AppTextStyles.bodyText1),
+            title: Text(
+              'Acak Urutan Butir Soal',
+              style: AppTextStyles.bodyText1,
+            ),
             subtitle: Text(
               'Mencegah kecurangan antar siswa yang duduk berdekatan',
               style: AppTextStyles.caption,
@@ -393,7 +424,10 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
           ),
           const Divider(height: 1),
           SwitchListTile(
-            title: Text('Acak Opsi Pilihan Jawaban (A-E)', style: AppTextStyles.bodyText1),
+            title: Text(
+              'Acak Opsi Pilihan Jawaban (A-E)',
+              style: AppTextStyles.bodyText1,
+            ),
             subtitle: Text(
               'Opsi jawaban diacak secara matematis untuk tiap peserta',
               style: AppTextStyles.caption,
@@ -404,7 +438,10 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
           ),
           const Divider(height: 1),
           SwitchListTile(
-            title: Text('Deteksi Keluar Layar (Anti-Cheat)', style: AppTextStyles.bodyText1),
+            title: Text(
+              'Deteksi Keluar Layar (Anti-Cheat)',
+              style: AppTextStyles.bodyText1,
+            ),
             subtitle: Text(
               'Beri peringatan atau kunci lembar ujian jika siswa membuka aplikasi lain',
               style: AppTextStyles.caption,
@@ -428,9 +465,18 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
       child: Column(
         children: [
           ListTile(
-            leading: const Icon(Icons.menu_book_outlined, color: AppColors.primaryBlue),
-            title: Text('Panduan & Petunjuk Menu Guru', style: AppTextStyles.bodyText1),
-            subtitle: Text('Buka kembali tur interaktif menu portal guru', style: AppTextStyles.caption),
+            leading: const Icon(
+              Icons.menu_book_outlined,
+              color: AppColors.primaryBlue,
+            ),
+            title: Text(
+              'Panduan & Petunjuk Menu Guru',
+              style: AppTextStyles.bodyText1,
+            ),
+            subtitle: Text(
+              'Buka kembali tur interaktif menu portal guru',
+              style: AppTextStyles.caption,
+            ),
             trailing: const Icon(Icons.arrow_forward_ios, size: 14),
             onTap: () {
               GuruNavigation.startTour(context);
@@ -438,9 +484,18 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
           ),
           const Divider(height: 1),
           ListTile(
-            leading: const Icon(Icons.smart_toy_outlined, color: AppColors.primaryBlue),
-            title: Text('Tanya UKKMate AI Assistant', style: AppTextStyles.bodyText1),
-            subtitle: Text('Asisten cerdas untuk bank soal dan modul UKK', style: AppTextStyles.caption),
+            leading: const Icon(
+              Icons.smart_toy_outlined,
+              color: AppColors.primaryBlue,
+            ),
+            title: Text(
+              'Tanya UKKMate AI Assistant',
+              style: AppTextStyles.bodyText1,
+            ),
+            subtitle: Text(
+              'Asisten cerdas untuk bank soal dan modul UKK',
+              style: AppTextStyles.caption,
+            ),
             trailing: const Icon(Icons.arrow_forward_ios, size: 14),
             onTap: () {
               Navigator.push(
@@ -451,9 +506,15 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
           ),
           const Divider(height: 1),
           ListTile(
-            leading: const Icon(Icons.info_outline, color: AppColors.textSecondary),
+            leading: const Icon(
+              Icons.info_outline,
+              color: AppColors.textSecondary,
+            ),
             title: Text('Tentang UKKMate Guru', style: AppTextStyles.bodyText1),
-            subtitle: Text('Versi 0.2.4 • Standar BNSP & Dapodik', style: AppTextStyles.caption),
+            subtitle: Text(
+              'Versi ${AppVersion.name} • Standar BNSP & Dapodik',
+              style: AppTextStyles.caption,
+            ),
             trailing: const Icon(Icons.arrow_forward_ios, size: 14),
             onTap: () {},
           ),
@@ -472,14 +533,22 @@ class _GuruPengaturanScreenState extends State<GuruPengaturanScreen> {
       child: Column(
         children: [
           ListTile(
-            leading: const Icon(Icons.lock_outline, color: AppColors.textPrimary),
+            leading: const Icon(
+              Icons.lock_outline,
+              color: AppColors.textPrimary,
+            ),
             title: Text('Ubah Kata Sandi NIP', style: AppTextStyles.bodyText1),
-            subtitle: Text('Perbarui keamanan akses portal guru Anda', style: AppTextStyles.caption),
+            subtitle: Text(
+              'Perbarui keamanan akses portal guru Anda',
+              style: AppTextStyles.caption,
+            ),
             trailing: const Icon(Icons.arrow_forward_ios, size: 14),
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Tautan ubah kata sandi telah dikirim ke email terdaftar Dapodik Anda'),
+                  content: Text(
+                    'Tautan ubah kata sandi telah dikirim ke email terdaftar Dapodik Anda',
+                  ),
                 ),
               );
             },

@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.7
+> **Versi Aplikasi:** v0.2.8
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -56,7 +56,7 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.7)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.8)
 
 1. **Video Splash Screen Sinematik 3 Detik Penuh (v0.2.0):**
    - Menampilkan berkas video animasi resolusi tinggi `assets/splash-screen.mp4` baru yang telah dipersingkat dan dioptimalkan menjadi tepat 3 detik.
@@ -212,6 +212,13 @@ flutter pub get
 
 ### Konfigurasi Supabase Flutter
 - Simpan Project URL dan publishable key di `BackendConfig`; publishable key memang ditujukan untuk aplikasi client.
+- Jalankan migration `supabase/migrations/202611120001_profile_signup_metadata.sql` melalui **Supabase → SQL Editor** untuk menyimpan NISN/nama signup dan path avatar.
+- Buat bucket private `avatars`, `materials`, dan `assignments`, lalu jalankan policies Storage yang sesuai dengan pola path `<user-uuid>/...`.
+- Pastikan schema `public` tersedia di Data API dan policy RLS tabel `users`, `materials`, serta `tasks` sudah aktif.
+- Untuk Google OAuth, masukkan Client ID/Secret di **Authentication → Providers → Google**. Callback Google adalah `https://<project-ref>.supabase.co/auth/v1/callback`; tambahkan `https://ukkmate.web.app` dan `io.supabase.ukkmate://login-callback/` ke URL redirect yang diizinkan Supabase.
+- Login email/password menggunakan email; NISN/NIP hanya data profil. Role guru harus ditetapkan oleh admin, bukan pengguna client.
+- Sesi CBT baru mencatat mulai/keluar; tabel `exam_results` dan perhitungan nilai tepercaya belum terhubung. Akses guru/admin lintas kelas juga menunggu tabel relasi kelas dan policy khusus.
+- Integrasi sekarang dikumpulkan di `BackendConfig`; pemisahan ke `auth_service.dart`, `supabase_service.dart`, dan `firebase_service.dart` masih menjadi perapian arsitektur berikutnya.
 - Aktifkan Row Level Security (RLS) dan buat policy sebelum tabel diakses dari aplikasi.
 - Jangan pernah menaruh service-role atau secret API key di aplikasi Flutter atau repositori.
 

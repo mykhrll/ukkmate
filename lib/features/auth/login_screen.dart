@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 import 'package:ukkmate/core/theme/app_colors.dart';
 import 'package:ukkmate/core/theme/app_text_styles.dart';
 import 'package:ukkmate/core/services/backend_config.dart';
@@ -19,18 +22,43 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscureRegisterPassword = true;
   bool _obscureRegisterConfirmPassword = true;
   bool _agreeTerms = false;
+  bool _isSubmitting = false;
+  bool _waitingForOAuth = false;
+  bool _didNavigate = false;
+  bool _isPasswordRecovery = false;
+  StreamSubscription? _authSubscription;
 
   final TextEditingController _nisnController = TextEditingController();
   final TextEditingController _loginIdController = TextEditingController();
-  final TextEditingController _loginPasswordController = TextEditingController();
-  final TextEditingController _registerEmailController = TextEditingController();
-  final TextEditingController _registerPasswordController = TextEditingController();
-  final TextEditingController _registerConfirmPasswordController = TextEditingController();
+  final TextEditingController _loginPasswordController =
+      TextEditingController();
+  final TextEditingController _registerNameController = TextEditingController();
+  final TextEditingController _registerEmailController =
+      TextEditingController();
+  final TextEditingController _registerPasswordController =
+      TextEditingController();
+  final TextEditingController _registerConfirmPasswordController =
+      TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _isLogin = widget.initialIsLogin;
+    if (BackendConfig().isInitialized) {
+      _authSubscription = BackendConfig().authStateChanges.listen((state) {
+        if (state.event == AuthChangeEvent.initialSession &&
+            state.session != null) {
+          unawaited(_openForCurrentUser());
+        } else if (_waitingForOAuth &&
+            state.event == AuthChangeEvent.signedIn) {
+          _waitingForOAuth = false;
+          unawaited(_openForCurrentUser());
+        } else if (state.event == AuthChangeEvent.passwordRecovery) {
+          _isPasswordRecovery = true;
+          _showPasswordRecoveryDialog();
+        }
+      });
+    }
   }
 
   @override
@@ -39,9 +67,187 @@ class _LoginScreenState extends State<LoginScreen> {
     _loginIdController.dispose();
     _loginPasswordController.dispose();
     _registerEmailController.dispose();
+    _registerNameController.dispose();
     _registerPasswordController.dispose();
     _registerConfirmPasswordController.dispose();
+    _authSubscription?.cancel();
     super.dispose();
+  }
+
+  void _showAuthMessage(String message, {bool isError = true}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? AppColors.errorRed : AppColors.primaryGreen,
+      ),
+    );
+  }
+
+  Future<void> _openForCurrentUser({String? role}) async {
+    if (_didNavigate || _isPasswordRecovery || !mounted) return;
+    try {
+      final profile = await BackendConfig().getCurrentProfile();
+      if (!mounted) return;
+      final currentRole = role ?? profile?['role'] as String?;
+      if (currentRole == null) {
+        _showAuthMessage(
+          'Profil akun belum tersedia. Jalankan migration Supabase.',
+        );
+        return;
+      }
+      _didNavigate = true;
+      final destination = currentRole == 'guru' || currentRole == 'admin'
+          ? const GuruNavigation(initialIndex: 0)
+          : const MainNavigation();
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => destination),
+        (route) => false,
+      );
+    } catch (error) {
+      _showAuthMessage('Gagal memuat profil akun: $error');
+    }
+  }
+
+  void _showPasswordRecoveryDialog() {
+    final passwordController = TextEditingController();
+    final confirmController = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Buat kata sandi baru'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Kata sandi baru'),
+              ),
+              TextField(
+                controller: confirmController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Ulangi kata sandi',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Nanti'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (passwordController.text != confirmController.text) {
+                  _showAuthMessage('Konfirmasi kata sandi tidak cocok.');
+                  return;
+                }
+                try {
+                  await BackendConfig().updatePassword(passwordController.text);
+                  if (!dialogContext.mounted) return;
+                  Navigator.pop(dialogContext);
+                  _showAuthMessage(
+                    'Kata sandi berhasil diperbarui.',
+                    isError: false,
+                  );
+                } catch (error) {
+                  _showAuthMessage('Gagal memperbarui kata sandi: $error');
+                }
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        ),
+      ).whenComplete(() {
+        passwordController.dispose();
+        confirmController.dispose();
+      });
+    });
+  }
+
+  Future<void> _handleLogin() async {
+    final email = _loginIdController.text.trim();
+    final password = _loginPasswordController.text;
+    if (!email.contains('@')) {
+      _showAuthMessage(
+        'Masukkan email akun yang terdaftar. NISN/NIP belum bisa dipakai sebagai login.',
+      );
+      return;
+    }
+    if (password.isEmpty) {
+      _showAuthMessage('Masukkan kata sandi.');
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+    try {
+      final role = await BackendConfig().signInWithEmail(
+        email: email,
+        password: password,
+      );
+      await _openForCurrentUser(role: role);
+    } catch (error) {
+      _showAuthMessage('Tidak dapat masuk: $error');
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  Future<void> _handleRegister() async {
+    final nisn = _nisnController.text.trim();
+    final nama = _registerNameController.text.trim();
+    final email = _registerEmailController.text.trim();
+    final password = _registerPasswordController.text;
+    final confirm = _registerConfirmPasswordController.text;
+
+    if (!RegExp(r'^\d{10}$').hasMatch(nisn)) {
+      _showAuthMessage('NISN harus terdiri dari 10 digit.');
+      return;
+    }
+    if (nama.isEmpty) {
+      _showAuthMessage('Masukkan nama lengkap.');
+      return;
+    }
+    if (!email.contains('@')) {
+      _showAuthMessage('Masukkan alamat email yang valid.');
+      return;
+    }
+    if (!_agreeTerms) {
+      _showAuthMessage('Harap setujui ketentuan etika uji sertifikasi.');
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+    try {
+      final hasSession = await BackendConfig().registerUser(
+        nisn: nisn,
+        nama: nama,
+        email: email,
+        password: password,
+        confirmPassword: confirm,
+      );
+      if (!mounted) return;
+      if (hasSession) {
+        _showAuthMessage('Akun berhasil dibuat.', isError: false);
+        await _openForCurrentUser(role: 'siswa');
+      } else {
+        setState(() => _isLogin = true);
+        _showAuthMessage(
+          'Pendaftaran berhasil. Periksa email untuk konfirmasi sebelum masuk.',
+          isError: false,
+        );
+      }
+    } catch (error) {
+      _showAuthMessage('Pendaftaran gagal: $error');
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   @override
@@ -213,8 +419,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: AnimatedDefaultTextStyle(
                           duration: const Duration(milliseconds: 200),
                           style: AppTextStyles.buttonText.copyWith(
-                            color: _isLogin ? Colors.white : AppColors.textSecondary,
-                            fontWeight: _isLogin ? FontWeight.bold : FontWeight.w600,
+                            color: _isLogin
+                                ? Colors.white
+                                : AppColors.textSecondary,
+                            fontWeight: _isLogin
+                                ? FontWeight.bold
+                                : FontWeight.w600,
                             fontSize: 14,
                           ),
                           child: Row(
@@ -222,7 +432,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               Icon(
                                 Icons.login,
-                                color: _isLogin ? Colors.white : AppColors.textSecondary,
+                                color: _isLogin
+                                    ? Colors.white
+                                    : AppColors.textSecondary,
                                 size: 18,
                               ),
                               const SizedBox(width: 8),
@@ -247,8 +459,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: AnimatedDefaultTextStyle(
                           duration: const Duration(milliseconds: 200),
                           style: AppTextStyles.buttonText.copyWith(
-                            color: !_isLogin ? Colors.white : AppColors.textSecondary,
-                            fontWeight: !_isLogin ? FontWeight.bold : FontWeight.w600,
+                            color: !_isLogin
+                                ? Colors.white
+                                : AppColors.textSecondary,
+                            fontWeight: !_isLogin
+                                ? FontWeight.bold
+                                : FontWeight.w600,
                             fontSize: 14,
                           ),
                           child: Row(
@@ -256,7 +472,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               Icon(
                                 Icons.person_add_alt_1_outlined,
-                                color: !_isLogin ? Colors.white : AppColors.textSecondary,
+                                color: !_isLogin
+                                    ? Colors.white
+                                    : AppColors.textSecondary,
                                 size: 18,
                               ),
                               const SizedBox(width: 8),
@@ -361,8 +579,7 @@ class _LoginScreenState extends State<LoginScreen> {
             iconColor: AppColors.primaryBlue,
             iconBgColor: AppColors.primaryBlue.withValues(alpha: 0.1),
             title: 'Siswa SMK (10 Digit NISN)',
-            desc:
-                'Otomatis membuka simulasi CBT, bank soal kejuruan sesuai data sekolah, dan latihan mandiri UKK.',
+            desc: 'Otomatis membuka simulasi CBT, bank soal kejuruan sesuai data sekolah, dan latihan mandiri UKK.',
           ),
           const SizedBox(height: 12),
           _buildInfoItem(
@@ -370,8 +587,7 @@ class _LoginScreenState extends State<LoginScreen> {
             iconColor: AppColors.primaryGreen,
             iconBgColor: AppColors.primaryGreen.withValues(alpha: 0.1),
             title: 'Guru Pendamping (18 Digit NIP)',
-            desc:
-                'Masuk untuk verifikasi peserta, pemantauan nilai ujian siswa, rombel binaan, dan penilaian lab.',
+            desc: 'Masuk untuk verifikasi peserta, pemantauan nilai ujian siswa, rombel binaan, dan penilaian lab.',
           ),
         ],
       ),
@@ -438,7 +654,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Nomor Induk Identitas (NISN / NIP)',
+                'Email Akun',
                 style: AppTextStyles.bodyText1.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -476,7 +692,7 @@ class _LoginScreenState extends State<LoginScreen> {
         TextField(
           controller: _loginIdController,
           decoration: InputDecoration(
-            hintText: 'Contoh: 0068492019 (Siswa) atau 19780512... (Guru)',
+            hintText: 'Masukkan email yang terdaftar',
             hintStyle: AppTextStyles.bodyText1.copyWith(
               color: AppColors.textSecondary.withValues(alpha: 0.5),
             ),
@@ -508,7 +724,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Kata Sandi / Token CBT',
+                  'Kata Sandi',
                   style: AppTextStyles.bodyText1.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -532,7 +748,7 @@ class _LoginScreenState extends State<LoginScreen> {
           controller: _loginPasswordController,
           obscureText: _obscureLoginPassword,
           decoration: InputDecoration(
-            hintText: 'Masukkan kata sandi atau token ujian',
+            hintText: 'Masukkan kata sandi akun',
             hintStyle: AppTextStyles.bodyText1.copyWith(
               color: AppColors.textSecondary.withValues(alpha: 0.5),
             ),
@@ -567,25 +783,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {
-              final id = _loginIdController.text.trim();
-              if (id.length >= 18) {
-                // Detected Teacher NIP
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const GuruNavigation(initialIndex: 0),
-                  ),
-                );
-              } else {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MainNavigation(),
-                  ),
-                );
-              }
-            },
+            onPressed: _isSubmitting ? null : _handleLogin,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryBlue,
               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -639,11 +837,10 @@ class _LoginScreenState extends State<LoginScreen> {
           width: double.infinity,
           child: OutlinedButton.icon(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const GuruNavigation(initialIndex: 0),
-                ),
+              setState(() => _isLogin = true);
+              _showAuthMessage(
+                'Gunakan email akun guru. Akses portal ditentukan oleh role akun.',
+                isError: false,
               );
             },
             icon: const Icon(
@@ -652,7 +849,7 @@ class _LoginScreenState extends State<LoginScreen> {
               size: 18,
             ),
             label: Text(
-              'Masuk sebagai Guru Pendamping (NIP Terverifikasi)',
+              'Akun guru? Masuk dengan email terdaftar',
               style: AppTextStyles.bodyText2.copyWith(
                 color: AppColors.successGreenText,
                 fontWeight: FontWeight.bold,
@@ -684,7 +881,9 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
                 isLogin ? 'atau masuk dengan' : 'atau daftar dengan',
-                style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
             const Expanded(child: Divider(color: AppColors.borderLight)),
@@ -709,7 +908,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 _buildGoogleLogo(),
                 const SizedBox(width: 12),
                 Text(
-                  isLogin ? 'Masuk dengan Akun Google' : 'Daftar dengan Akun Google',
+                  isLogin
+                      ? 'Masuk dengan Akun Google'
+                      : 'Daftar dengan Akun Google',
                   style: AppTextStyles.bodyText1.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -746,244 +947,97 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _handleGoogleAuth() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  _buildGoogleLogo(),
-                  const SizedBox(width: 10),
-                  Text(
-                    'Pilih Akun Google Anda',
-                    style: AppTextStyles.headline3.copyWith(fontSize: 16),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Lanjutkan autentikasi ke UKKMate (Firebase & Supabase Auth)',
-                style: AppTextStyles.caption,
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const CircleAvatar(
-                  backgroundImage: AssetImage('assets/pp_default_laki-laki.jpg'),
-                ),
-                title: Text(
-                  'Muhamad Zidan',
-                  style: AppTextStyles.bodyText1.copyWith(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text('muhamadzidan@gmail.com', style: AppTextStyles.caption),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-                onTap: () async {
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Berhasil masuk dengan akun Google (muhamadzidan@gmail.com)'),
-                      backgroundColor: AppColors.primaryGreen,
-                    ),
-                  );
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MainNavigation()),
-                  );
-                },
-              ),
-              const Divider(),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight.withValues(alpha: 0.5),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.person_add_alt, color: AppColors.textSecondary),
-                ),
-                title: Text('Gunakan Akun Google Lain', style: AppTextStyles.bodyText2),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Menghubungkan ke layanan Google OAuth...'),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 10),
-            ],
-          ),
-        );
-      },
-    );
+  Future<void> _handleGoogleAuth() async {
+    if (_isSubmitting) return;
+    setState(() {
+      _isSubmitting = true;
+      _waitingForOAuth = true;
+    });
+    try {
+      final launched = await BackendConfig().signInWithGoogle();
+      if (!launched) {
+        _waitingForOAuth = false;
+        _showAuthMessage('Proses Google Sign-In tidak dapat dimulai.');
+      }
+    } catch (error) {
+      _waitingForOAuth = false;
+      _showAuthMessage('Google Sign-In gagal: $error');
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   void _showForgotPasswordDialog() {
     final TextEditingController emailController = TextEditingController();
     bool isSending = false;
 
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 24,
-                right: 24,
-                top: 24,
-                bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            24,
+            24,
+            24,
+            MediaQuery.viewInsetsOf(ctx).bottom + 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Reset kata sandi', style: AppTextStyles.headline3),
+              const SizedBox(height: 12),
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  labelText: 'Email akun',
+                  prefixIcon: Icon(Icons.email_outlined),
+                ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 44,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.borderLight,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryBlue.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.lock_reset,
-                          color: AppColors.primaryBlue,
-                          size: 26,
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Lupa Kata Sandi', style: AppTextStyles.headline3),
-                            Text(
-                              'Kirim tautan reset ke email terdaftar Anda',
-                              style: AppTextStyles.caption,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Masukkan alamat email aktif yang terdaftar di akun UKKMate atau Dapodik:',
-                    style: AppTextStyles.bodyText2,
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      hintText: 'nama.siswa@smk.belajar.id atau email pribadi',
-                      hintStyle: AppTextStyles.bodyText1.copyWith(
-                        color: AppColors.textSecondary.withValues(alpha: 0.5),
-                      ),
-                      prefixIcon: const Icon(Icons.email_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.borderLight),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: isSending
-                          ? null
-                          : () async {
-                              final email = emailController.text.trim();
-                              if (email.isEmpty || !email.contains('@')) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Masukkan alamat email yang valid!'),
-                                    backgroundColor: AppColors.errorRed,
-                                  ),
-                                );
-                                return;
-                              }
-                              setModalState(() => isSending = true);
-                              await BackendConfig().sendPasswordResetEmail(email);
-                              if (!ctx.mounted) return;
-                              Navigator.pop(ctx);
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Tautan reset kata sandi telah dikirim ke $email! Silakan periksa inbox email Anda.',
-                                  ),
-                                  backgroundColor: AppColors.primaryGreen,
-                                  duration: const Duration(seconds: 4),
-                                ),
-                              );
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryBlue,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: isSending
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Text('Kirim Tautan Reset', style: AppTextStyles.buttonText),
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: isSending
+                      ? null
+                      : () async {
+                          final email = emailController.text.trim();
+                          if (!email.contains('@')) {
+                            _showAuthMessage('Masukkan email yang valid.');
+                            return;
+                          }
+                          setModalState(() => isSending = true);
+                          try {
+                            await BackendConfig().sendPasswordResetEmail(email);
+                            if (!ctx.mounted) return;
+                            Navigator.pop(ctx);
+                            _showAuthMessage(
+                              'Jika email terdaftar, tautan reset akan dikirim.',
+                              isError: false,
+                            );
+                          } catch (error) {
+                            if (!ctx.mounted) return;
+                            setModalState(() => isSending = false);
+                            _showAuthMessage(
+                              'Gagal meminta reset kata sandi: $error',
+                            );
+                          }
+                        },
+                  child: isSending
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Kirim Tautan Reset'),
+                ),
               ),
-            );
-          },
-        );
-      },
-    );
+            ],
+          ),
+        ),
+      ),
+    ).whenComplete(emailController.dispose);
   }
 
   // ===================== REGISTER VIEW =====================
@@ -1058,7 +1112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'Dapodik Terintegrasi',
+                    'Profil Supabase',
                     style: AppTextStyles.caption.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -1132,11 +1186,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     prefixIcon: const Icon(Icons.badge_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: AppColors.borderLight),
+                      borderSide: const BorderSide(
+                        color: AppColors.borderLight,
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: AppColors.borderLight),
+                      borderSide: const BorderSide(
+                        color: AppColors.borderLight,
+                      ),
                     ),
                   ),
                 ),
@@ -1146,8 +1204,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('NISN berhasil divalidasi dengan Dapodik Kemendikbudristek!'),
-                      backgroundColor: AppColors.primaryGreen,
+                      content: Text(
+                        'Validasi Dapodik belum terhubung. NISN akan disimpan ke profil akun.',
+                      ),
+                      backgroundColor: AppColors.warningOrange,
                     ),
                   );
                 },
@@ -1162,7 +1222,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryBlue,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -1183,10 +1246,14 @@ class _LoginScreenState extends State<LoginScreen> {
               Text('Nama Lengkap Siswa', style: AppTextStyles.subtitle2),
               Row(
                 children: [
-                  const Icon(Icons.bolt, color: AppColors.primaryGreen, size: 14),
+                  const Icon(
+                    Icons.bolt,
+                    color: AppColors.primaryGreen,
+                    size: 14,
+                  ),
                   const SizedBox(width: 4),
                   Text(
-                    'Sesuai Dapodik / Ijazah',
+                    'Nama pada profil akun',
                     style: AppTextStyles.caption.copyWith(
                       color: AppColors.primaryGreen,
                       fontWeight: FontWeight.bold,
@@ -1198,9 +1265,9 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           const SizedBox(height: 8),
           TextField(
-            enabled: false,
+            controller: _registerNameController,
             decoration: InputDecoration(
-              hintText: 'Muhamad Zidan (Otomatis dari Dapodik)',
+              hintText: 'Masukkan nama lengkap',
               hintStyle: AppTextStyles.bodyText1.copyWith(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w600,
@@ -1231,10 +1298,14 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               Row(
                 children: [
-                  const Icon(Icons.sync, color: AppColors.primaryGreen, size: 14),
+                  const Icon(
+                    Icons.sync,
+                    color: AppColors.primaryGreen,
+                    size: 14,
+                  ),
                   const SizedBox(width: 4),
                   Text(
-                    'Otomatis via Dapodik',
+                    'Data profil',
                     style: AppTextStyles.caption.copyWith(
                       color: AppColors.primaryGreen,
                       fontWeight: FontWeight.bold,
@@ -1290,7 +1361,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                              color: AppColors.primaryGreen.withValues(
+                                alpha: 0.1,
+                              ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -1312,7 +1385,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(Icons.verified, color: AppColors.primaryGreen, size: 20),
+                const Icon(
+                  Icons.verified,
+                  color: AppColors.primaryGreen,
+                  size: 20,
+                ),
               ],
             ),
           ),
@@ -1324,10 +1401,14 @@ class _LoginScreenState extends State<LoginScreen> {
               Text('Jenis Kelamin & Avatar', style: AppTextStyles.subtitle2),
               Row(
                 children: [
-                  const Icon(Icons.sync, color: AppColors.primaryGreen, size: 14),
+                  const Icon(
+                    Icons.sync,
+                    color: AppColors.primaryGreen,
+                    size: 14,
+                  ),
                   const SizedBox(width: 4),
                   Text(
-                    'Otomatis via Dapodik',
+                    'Avatar pilihan awal',
                     style: AppTextStyles.caption.copyWith(
                       color: AppColors.primaryGreen,
                       fontWeight: FontWeight.bold,
@@ -1376,7 +1457,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             child: Text(
                               'Avatar Default Terassign',
-                              style: AppTextStyles.caption.copyWith(fontSize: 8),
+                              style: AppTextStyles.caption.copyWith(
+                                fontSize: 8,
+                              ),
                             ),
                           ),
                         ],
@@ -1484,7 +1567,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 onPressed: () {
                   setState(() {
-                    _obscureRegisterConfirmPassword = !_obscureRegisterConfirmPassword;
+                    _obscureRegisterConfirmPassword =
+                        !_obscureRegisterConfirmPassword;
                   });
                 },
               ),
@@ -1508,7 +1592,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? Icons.check_circle
                       : Icons.cancel,
                   size: 14,
-                  color: _registerPasswordController.text ==
+                  color:
+                      _registerPasswordController.text ==
                           _registerConfirmPasswordController.text
                       ? AppColors.primaryGreen
                       : AppColors.errorRed,
@@ -1520,7 +1605,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? 'Konfirmasi kata sandi cocok'
                       : 'Kata sandi belum sama',
                   style: AppTextStyles.caption.copyWith(
-                    color: _registerPasswordController.text ==
+                    color:
+                        _registerPasswordController.text ==
                             _registerConfirmPasswordController.text
                         ? AppColors.primaryGreen
                         : AppColors.errorRed,
@@ -1562,63 +1648,7 @@ class _LoginScreenState extends State<LoginScreen> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                final nisn = _nisnController.text.trim();
-                final pass = _registerPasswordController.text;
-                final confirm = _registerConfirmPasswordController.text;
-
-                if (nisn.length < 10) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Harap masukkan 10 digit NISN yang valid!'),
-                      backgroundColor: AppColors.errorRed,
-                    ),
-                  );
-                  return;
-                }
-                if (pass.length < 8) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Kata sandi harus minimal 8 karakter!'),
-                      backgroundColor: AppColors.errorRed,
-                    ),
-                  );
-                  return;
-                }
-                if (pass != confirm) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Konfirmasi kata sandi tidak cocok! Pastikan memasukkan kata sandi yang sama 2 kali.',
-                      ),
-                      backgroundColor: AppColors.errorRed,
-                    ),
-                  );
-                  return;
-                }
-                if (!_agreeTerms) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Harap setujui ketentuan etika uji sertifikasi!'),
-                      backgroundColor: AppColors.warningOrange,
-                    ),
-                  );
-                  return;
-                }
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Pendaftaran akun siswa berhasil! Menyinkronkan data Dapodik...',
-                    ),
-                    backgroundColor: AppColors.primaryGreen,
-                  ),
-                );
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MainNavigation()),
-                );
-              },
+              onPressed: _isSubmitting ? null : _handleRegister,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryBlue,
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -1634,7 +1664,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: AppTextStyles.buttonText,
                   ),
                   const SizedBox(width: 8),
-                  const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                  const Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: 18,
+                  ),
                 ],
               ),
             ),
@@ -1688,7 +1722,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const GuruNavigation(initialIndex: 0),
+                            builder: (_) =>
+                                const GuruNavigation(initialIndex: 0),
                           ),
                         );
                       },

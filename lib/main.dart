@@ -5,11 +5,13 @@ import 'package:ukkmate/features/splash/splash_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ukkmate/core/theme/app_colors.dart';
 import 'package:ukkmate/firebase_options.dart';
+import 'package:ukkmate/core/services/backend_config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await BackendConfig().initialize();
 
   runApp(const MyApp());
 }

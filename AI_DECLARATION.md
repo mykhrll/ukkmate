@@ -6,7 +6,7 @@
 **NPM:** 2413025012  
 **Program Studi:** Pendidikan Teknologi Informasi  
 **Judul Aplikasi:** UKKMate: Aplikasi Simulasi dan Bank Soal Uji Kompetensi Keahlian untuk Siswa SMK  
-**Versi Saat Ini:** v0.2.7 (Konfigurasi Supabase client)
+**Versi Saat Ini:** v0.2.8 (Integrasi Supabase Auth, Database, dan Storage)
 **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -205,6 +205,15 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 - Tidak menyimpan service-role atau secret API key di aplikasi client.
 - Integrasi Supabase runtime, dependency Flutter, dan policy RLS masih perlu disiapkan terpisah.
 - Sinkronisasi versi aplikasi ke `v0.2.7+19`.
+
+### 📅 Integrasi Supabase Flutter (Rilis v0.2.8)
+- Menginisialisasi `supabase_flutter` dan mengganti login email, signup, reset password, Google OAuth, profil, dan logout dari simulasi menjadi operasi Supabase.
+- Menghubungkan daftar materi/tugas ke tabel `materials`/`tasks`; tugas dapat diperbarui dan lampiran diunggah ke bucket private `assignments`.
+- Menambahkan upload avatar private dan penyimpanan path pada profil; migration signup menyimpan NISN/nama dari metadata Auth.
+- Menyatukan label versi frontend dan backend config melalui `AppVersion` (`0.2.8+20`) serta memperbarui `pubspec.yaml`.
+- Sesi CBT mencatat mulai/keluar, tetapi tabel `exam_results`, perhitungan skor tepercaya, dan policy akses guru/admin lintas kelas belum diimplementasikan.
+- Seluruh operasi Supabase saat ini berada di `BackendConfig`; pemisahan service auth/database/Firebase masih menjadi tindak lanjut arsitektur.
+- OAuth dan request data live tetap memerlukan migration, bucket, RLS/Data API, serta konfigurasi redirect/provider di Supabase Dashboard; belum dapat dinyatakan teruji live tanpa akun/perangkat.
 
 ---
 
