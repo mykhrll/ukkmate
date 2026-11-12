@@ -6,7 +6,7 @@
 **NPM:** 2413025012  
 **Program Studi:** Pendidikan Teknologi Informasi  
 **Judul Aplikasi:** UKKMate: Aplikasi Simulasi dan Bank Soal Uji Kompetensi Keahlian untuk Siswa SMK  
-**Versi Saat Ini:** v0.2.8 (Integrasi Supabase Auth, Database, dan Storage)
+**Versi Saat Ini:** v0.2.9 (Audit kredensial dan perlindungan file lokal)
 **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -214,6 +214,12 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 - Sesi CBT mencatat mulai/keluar, tetapi tabel `exam_results`, perhitungan skor tepercaya, dan policy akses guru/admin lintas kelas belum diimplementasikan.
 - Seluruh operasi Supabase saat ini berada di `BackendConfig`; pemisahan service auth/database/Firebase masih menjadi tindak lanjut arsitektur.
 - OAuth dan request data live tetap memerlukan migration, bucket, RLS/Data API, serta konfigurasi redirect/provider di Supabase Dashboard; belum dapat dinyatakan teruji live tanpa akun/perangkat.
+
+### 📅 Audit Kredensial (Rilis v0.2.9)
+- Memindai 40 commit yang tersedia pada branch lokal dan `origin/main` untuk pola OAuth secret, Supabase secret/service-role, dan token JWT privat; tidak ditemukan kecocokan.
+- Menambahkan aturan ignore untuk file environment lokal, direktori `secrets/`, dan signing key.
+- Firebase client API keys dan Supabase publishable key tetap berada dalam konfigurasi aplikasi karena bersifat public-client; key rahasia yang pernah dibagikan harus dirotasi di dashboard penyedia.
+- Sinkronisasi versi aplikasi ke `v0.2.9+21`.
 
 ---
 

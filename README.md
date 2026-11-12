@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.8
+> **Versi Aplikasi:** v0.2.9
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -56,7 +56,7 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.8)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.9)
 
 1. **Video Splash Screen Sinematik 3 Detik Penuh (v0.2.0):**
    - Menampilkan berkas video animasi resolusi tinggi `assets/splash-screen.mp4` baru yang telah dipersingkat dan dioptimalkan menjadi tepat 3 detik.
@@ -221,6 +221,11 @@ flutter pub get
 - Integrasi sekarang dikumpulkan di `BackendConfig`; pemisahan ke `auth_service.dart`, `supabase_service.dart`, dan `firebase_service.dart` masih menjadi perapian arsitektur berikutnya.
 - Aktifkan Row Level Security (RLS) dan buat policy sebelum tabel diakses dari aplikasi.
 - Jangan pernah menaruh service-role atau secret API key di aplikasi Flutter atau repositori.
+
+### Keamanan kredensial
+- Firebase API key dan Supabase publishable key adalah konfigurasi client yang memang terlihat di aplikasi; batasi penggunaannya pada layanan yang diperlukan dan lindungi data memakai RLS, Storage policies, serta aturan Firebase.
+- OAuth client secret, Supabase secret/service-role, signing key, dan password hanya untuk lingkungan backend tepercaya; jangan simpan di Flutter, Git, atau chat.
+- File `.env`, folder `secrets/`, dan keystore lokal diabaikan oleh Git.
 
 3. **Verifikasi kesehatan kode & pengujian:**
    ```bash

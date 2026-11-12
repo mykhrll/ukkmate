@@ -1,6 +1,13 @@
 # ==========================================
 # Miscellaneous
 # ==========================================
+.env
+.env.*
+!.env.example
+/secrets/
+*.jks
+*.keystore
+*.p12
 *.class
 *.log
 *.pyc
