@@ -8,15 +8,15 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.10
+> **Versi Aplikasi:** v0.2.11+23
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
 
 ## 📌 Ringkasan Aplikasi
-**UKKMate** adalah aplikasi mobile berbasis Flutter yang dirancang khusus untuk mendampingi peserta didik Sekolah Menengah Kejuruan (SMK) dalam mempersiapkan dan menghadapi Uji Kompetensi Keahlian (UKK) berstandar BNSP dan LSP-P1. 
+**UKKMate** adalah aplikasi mobile berbasis Flutter untuk membantu siswa SMK berlatih menghadapi Uji Kompetensi Keahlian (UKK). Aplikasi ini memiliki layar latihan, materi, tugas, simulasi CBT, profil siswa, dan portal guru.
 
-Aplikasi ini mengusung pendekatan **Offline-First**, memungkinkan siswa berlatih mengerjakan bank soal, membaca modul materi kejuruan, dan mengikuti simulasi CBT di lingkungan lab sekolah meskipun jaringan internet lab mengalami gangguan atau offline. Saat perangkat terhubung ke internet atau jaringan sekolah, data jawaban, nilai, dan rekap progres akan tersinkronisasi secara otomatis ke basis data cloud (**Firebase & Supabase**).
+Firebase Auth menangani akun; Supabase digunakan untuk data profil, materi, tugas, dan penyimpanan berkas. Integrasi native Google dan migration Firebase-to-Supabase sudah tersedia di kode, tetapi perlu konfigurasi Dashboard serta uji perangkat sebelum dinyatakan aktif untuk pengguna. *Offline-first* masih menjadi target: cache data persisten dan antrean sinkronisasi belum terhubung, sementara layar status sinkronisasi masih menampilkan contoh statis. Mockup pada galeri juga bukan bukti semua alur backend telah berfungsi.
 
 ---
 
@@ -56,7 +56,7 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.10)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.11)
 
 1. **Video Splash Screen Sinematik 3 Detik Penuh (v0.2.0):**
    - Menampilkan berkas video animasi resolusi tinggi `assets/splash-screen.mp4` baru yang telah dipersingkat dan dioptimalkan menjadi tepat 3 detik.
@@ -72,7 +72,7 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 3. **Keamanan & Autentikasi Pengguna:**
    - **Konfirmasi Kata Sandi (2x Input):** Form pendaftaran siswa baru mewajibkan konfirmasi kata sandi dengan validasi kecocokan karakter secara *real-time* dan syarat minimal 8 karakter.
-   - **Autentikasi Akun Google:** Tombol *Masuk dengan Google* dan *Daftar dengan Google* pada antarmuka login terpadu dengan alur pemilihan akun Google yang siap dihubungkan ke Firebase Auth / Supabase OAuth.
+   - **Autentikasi Akun Google:** Aplikasi memakai `google_sign_in` native dan Firebase Auth. Pemilihan akun dan login langsung di APK belum diverifikasi pada perangkat; aktifkan Google provider dan daftarkan SHA-1 Android terlebih dahulu.
    - **Lupa Kata Sandi Interaktif:** Pengguna dapat menekan tautan *Lupa Kata Sandi?* untuk mengirimkan tautan reset kata sandi langsung ke email terdaftar Dapodik.
 
 4. **Portal Guru Pendamping (Teacher Portal) Terarah:**
@@ -85,10 +85,10 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
    - Pengaturan ujian CBT: Acak urutan butir soal, acak opsi pilihan jawaban (A–E), dan kontrol deteksi anti-kecurangan (*anti-cheat screen exit*).
    - Dialog konfirmasi keluar akun yang aman.
 
-6. **UKKMate AI Assistant (Chat Bot Interaktif):**
+6. **Chatbot Bantuan Berbasis Aturan (Belum memakai LLM):**
    - Tombol melayang (`FloatingChatButton`) kini langsung membuka halaman percakapan interaktif **UKKMate AI Assistant** (`ChatBotScreen`).
    - Dilengkapi *quick prompts* seputar kisi-kisi UKK RPL, query database SQL, strategi manajemen waktu CBT, dan petunjuk sinkronisasi Dapodik.
-   - Fitur salin teks jawaban, indikator status bot *Online*, dan animasi pengetikan respons AI.
+   - Respons saat ini berasal dari aturan/kata kunci lokal; belum memanggil model AI/LLM atau backend. Label *Online* pada UI bukan status koneksi layanan AI.
 
 7. **Penanggalan Dinamis & Waktu Nyata (WIB):**
    - Menghilangkan tahun hardcoded (seperti 2024), digantikan dengan penanggalan dinamis berbasis waktu lokal HP (WIB).
@@ -138,6 +138,15 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
     - Memisahkan alur kartu grid *Latihan Mandiri* di dashboard siswa dari navigasi tab bar bawah, menggantikannya dengan halaman mandiri tersendiri (`LatihanMandiriScreen`).
     - Menyelaraskan tata letak header sub-menu dengan modul lainnya (`TugasScreen` & `MateriScreen`), dilengkapi tombol kembali (`arrow_back`), logo resmi UKKMate, judul sub-menu `UKKMATE CBT`, indikator status *Tersinkron*, dan foto profil asesi.
     - Dilengkapi fitur pendukung belajar mandiri: kartu target harian siswa, pemilihan 3 mode latihan (Drill Kilat, Studi Kasus, Uji Waktu), filter chip kategori kompetensi interaktif, daftar paket soal studi kasus terarah, serta kartu tips belajar sukses UKK.
+
+17. **Google Sign-In Native dan Jembatan Firebase–Supabase (v0.2.10):**
+    - Mengalihkan autentikasi email/password dan Google ke Firebase Auth; tombol Google memakai pemilih akun `google_sign_in` di aplikasi.
+    - Menyediakan Firebase ID token untuk Supabase Third-Party Auth dan migration RLS/storage berdasarkan Firebase UID.
+    - APK debug berhasil dibangun, `flutter analyze` bersih, dan 3 widget test lulus. Login native di perangkat serta migration/backend live belum diverifikasi.
+
+18. **Catatan Kesiapan Minggu ke-7 (v0.2.11):**
+    - Pembaruan ini merapikan catatan proyek dan mengoreksi klaim *offline-first* serta chatbot agar sesuai implementasi saat ini.
+    - Perhitungan hasil ujian, otorisasi guru lintas kelas, cache offline persisten, dan chatbot LLM tetap menjadi pekerjaan lanjutan.
 
 ---
 

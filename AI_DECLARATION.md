@@ -6,13 +6,13 @@
 **NPM:** 2413025012  
 **Program Studi:** Pendidikan Teknologi Informasi  
 **Judul Aplikasi:** UKKMate: Aplikasi Simulasi dan Bank Soal Uji Kompetensi Keahlian untuk Siswa SMK  
-**Versi Saat Ini:** v0.2.10 (Firebase native Google Sign-In dan Supabase third-party auth)
+**Versi Saat Ini:** v0.2.11+23 (dokumentasi progres minggu ke-7; Firebase native Google Sign-In)
 **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
 
 ## 1. Daftar Alat Kecerdasan Buatan (AI Tools)
-Dalam pengembangan aplikasi UKKMate mulai dari inisiasi, UTS, hingga Progres 5 dan Progres Minggu ke 6, alat bantu AI yang digunakan adalah:
+Dalam pengembangan aplikasi UKKMate mulai dari inisiasi, UTS, Progres 5, hingga minggu ke-7, alat bantu AI yang digunakan adalah:
 1. **GitHub Copilot (VS Code Extension):** Digunakan untuk autocompletion kode, pembuatan boilerplate layout widget Flutter, serta penulisan sintaks model data awal.
 2. **Google Antigravity / Gemini 3.8 Flash (High):** Digunakan sebagai *collaborative coding partner* dalam arsitektur perangkat lunak, perancangan antarmuka responsif sesuai kebutuhan pengguna, perbaikan galat lint (*static analysis*), integrasi alur autentikasi, dan otomatisasi deployment repositori Git.
 
@@ -25,9 +25,10 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 | Periode | Versi Rilis | Fokus Pengembangan Utama |
 | :--- | :--- | :--- |
 | **Minggu 1 – 2** | **v0.0.1** | Inisiasi proyek Flutter, *design system*, autentikasi NISN/NIP, modul materi, tugas lab, dan dashboard siswa. |
-| **Minggu 3 – 4** | **v0.0.3** | Katalog bank soal bertingkat, riwayat & analitik capaian kompetensi, arsitektur *Offline-First caching*, serta validasi profil Dapodik. |
+| **Minggu 3 – 4** | **v0.0.3** | Katalog bank soal bertingkat, riwayat & analitik capaian kompetensi, rancangan target *Offline-First* (cache/sinkronisasi persisten belum aktif), serta validasi profil Dapodik. |
 | **Minggu 5** | **v0.0.5** | Sesi ujian CBT interaktif (`LatihanSoalScreen`), Portal Guru Pendamping (Dashboard & Daftar Asesi), penyelarasan warna tema logo, dan finalisasi berkas UTS. |
 | **Minggu 6**<br>*(UTS & Progres Berkelanjutan)* | • **v0.1.0** (UTS)<br>• **v0.1.5** (Progres 5)<br>• **v0.1.6**<br>• **v0.1.7**<br>• **v0.1.8**<br>• **v0.1.9**<br>• **v0.2.0**<br>• **v0.2.1**<br>• **v0.2.2**<br>• **v0.2.3**<br>• **v0.2.4** | • **v0.1.0 (UTS):** Smooth navigation guru, floating AI chatbot scaffolding, keamanan ujian (anti-screenshot & anti-copy), Bank Soal guru, dan penyempurnaan UI.<br>• **v0.1.5 (Progres 5):** Video splash screen (3-5s), tutorial pengguna baru, konfirmasi kata sandi pendaftaran, login Google, lupa kata sandi via email, direct access tab Kelas untuk guru, UI Pengaturan Guru lengkap, implementasi UI interaktif Chat Bot AI, pembersihan data demo, dan penyesuaian tanggal dinamis (WIB).<br>• **v0.1.6:** Perbaikan kegagalan build APK di Windows (`kotlin.incremental=false`), penghentian daemon pengunci file, konfigurasi `minSdk 21`, dan optimasi kompilasi `assembleRelease`.<br>• **v0.1.7:** Integrasi galeri visual 19 mockup UI aplikasi ke `README.md`, penambahan logo header terpusat, pengelompokan alur antarmuka komprehensif, dan sinkronisasi versi aplikasi.<br>• **v0.1.8:** Penyempurnaan video splash screen murni sinematik: penghapusan kedipan splash screen lama (fallback UI), penghapusan tombol lewati & overlay branding footer, serta inisiasi progres Minggu ke 6.<br>• **v0.1.9:** Dukungan debugging web browser Google Chrome: inisialisasi timer independen anti-stuck, penyesuaian Chrome Autoplay Policy (`volume 0`), CSS styling background di `index.html`, isolasi platform channel web, dan frame preview responsif (`maxWidth: 480`).<br>• **v0.2.0:** Implementasi pemutaran penuh video splash screen 3 detik (`assets/splash-screen.mp4`) hingga selesai tanpa dipotong (*video completion listener*), buffer timer toleransi dinamis, dan penyelesaian modul splash Minggu ke 6.<br>• **v0.2.1:** Perbaikan galat Gradle build `this and base files have different roots` di Windows akibat pemisahan drive proyek (Drive D:) dan Pub Cache (Drive C:) melalui pengecekan drive root pada `android/build.gradle.kts`.<br>• **v0.2.2:** Penambahan deklarasi plugin `com.android.library` di `android/settings.gradle.kts` dan konfigurasi isolasi Java Language Server pada `.vscode/settings.json` untuk menghilangkan galat notifikasi IDE 'Source: Java'.<br>• **v0.2.3:** Transformasi tutorial menjadi tur interaktif pop-up menu pasca-login (coach mark spotlight), direct splash navigation ke login, sinkronisasi tab reaktif, dan pemicuan tur dari profil/pengaturan guru.<br>• **v0.2.4:** Pemisahan alur kartu 'Latihan Mandiri' di beranda siswa menjadi layar tersendiri (`LatihanMandiriScreen`) berstandar sub-menu (tombol kembali, logo resmi UKKMate, status tersinkron, foto profil), hero target harian, 3 mode latihan, filter chips kategori kompetensi, dan daftar studi kasus. |
+| **Minggu 7** | **v0.2.10** (implementasi Firebase native Auth)<br>**v0.2.11+23** (catatan progres) | • Mengarahkan agar Google Sign-In di APK menampilkan pemilih akun native dan autentikasi dikelola Firebase.<br>• Meminta Supabase tetap digunakan untuk data dan aksesnya dibatasi dengan Firebase ID token/RLS.<br>• Menentukan proyek sebagai kerja individu dan meminta evaluasi kesiapan yang transparan. | • Mengimplementasikan `google_sign_in` ke Firebase Auth, menyambungkan Firebase ID token ke Supabase, dan menyiapkan migration RLS/storage.<br>• Menghapus callback OAuth browser Supabase yang tidak lagi dipakai.<br>• Memvalidasi source dengan `flutter analyze`, `flutter test` (3 test), dan build APK debug; login perangkat serta konfigurasi live tetap belum terverifikasi.<br>• Memperbarui dokumentasi agar klaim offline-first dan chatbot sesuai implementasi saat ini. |
 
 
 
@@ -221,18 +222,24 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 - Firebase client API keys dan Supabase publishable key tetap berada dalam konfigurasi aplikasi karena bersifat public-client; key rahasia yang pernah dibagikan harus dirotasi di dashboard penyedia.
 - Sinkronisasi versi aplikasi ke `v0.2.9+21`.
 
-### 📅 Firebase Native Auth (Rilis v0.2.10)
+### 📅 Firebase Native Auth (Rilis v0.2.10, Progres Minggu ke-7)
 - Mengganti Google OAuth browser Supabase dengan pemilih akun native `google_sign_in` dan `FirebaseAuth.signInWithCredential`.
 - Memakai Firebase Auth untuk email/password, reset password, Google Sign-In, serta sesi pengguna.
 - Menghubungkan Firebase ID token ke Supabase Third-Party Auth dan menambahkan migration RLS yang membatasi baris serta Storage berdasarkan Firebase project dan UID.
 - Menyinkronkan versi aplikasi dan label UI ke `v0.2.10+22`.
 - Pengujian native login tetap memerlukan Google provider Firebase aktif, SHA-1 Android benar, Supabase Third-Party Auth Firebase aktif, dan perangkat yang menjalankan build terbaru.
 
+### 📅 Catatan Progres Minggu ke-7 (Dokumentasi v0.2.11+23)
+- Menambahkan ringkasan minggu ke-7 pada README dan deklarasi AI agar riwayat versi, kontribusi individu, dan status teknis terbaru tercatat.
+- Mengoreksi klaim *offline-first*: layar status sinkronisasi dan antrean pada aplikasi masih berupa contoh UI; cache lokal persisten dan proses sinkronisasi otomatis belum terhubung.
+- Mengoreksi label chatbot: respons sekarang dibuat oleh aturan kata kunci lokal, belum menggunakan layanan model bahasa (LLM).
+- Penilaian kesiapan penggunaan dalam laporan bersifat estimasi, bukan persentase fitur selesai. Integrasi backend live dan uji login pada perangkat harus dilakukan sebelum pemakaian lebih luas.
+
 ---
 
 ## 3. Pembagian Peran (Human vs AI Contribution)
 
-Pembagian peran kolaboratif antara mahasiswa dan asisten AI dikelompokkan secara terstruktur, urut, dan sistematis per minggu pengerjaan (Minggu 1 s/d Minggu 6):
+Pembagian peran kolaboratif antara mahasiswa dan asisten AI dikelompokkan secara terstruktur, urut, dan sistematis per minggu pengerjaan (Minggu 1 s/d Minggu 7):
 
 | Minggu / Tahapan | Modul & Fokus Fitur | Kontribusi & Arahan Mahasiswa (Manual) | Implementasi Asisten AI |
 | :--- | :--- | :--- | :--- |
@@ -370,6 +377,16 @@ Pembagian peran kolaboratif antara mahasiswa dan asisten AI dikelompokkan secara
   4. **Verifikasi Kualitas Kode:** Memastikan seluruh pengujian otomatis lulus (`flutter test`) dan analisis statis bebas dari peringatan (`flutter analyze`).
 
 ---
+
+### Studi Kasus 10: Mengalihkan Google Sign-In dari OAuth Browser ke Firebase Native
+- **Tujuan / Instruksi (Prompt):**
+  *"Saya ingin tombol daftar/login Google di APK menampilkan popup pemilih akun di dalam alur aplikasi, bukan membuka web; autentikasi signup/login tetap dikelola Firebase."*
+- **Masalah yang ditemukan:**
+  Sebelumnya tombol Google memanggil Supabase OAuth browser. Pesan `deleted_client` menunjuk konfigurasi client OAuth pada alur tersebut; flow itu tidak memenuhi kebutuhan pemilih akun native.
+- **Tindakan dan implementasi:**
+  Menggunakan `google_sign_in` untuk memilih akun, meneruskan credential ke Firebase Auth, dan memasok Firebase ID token ke Supabase sebagai Third-Party Auth. Migration RLS mengaitkan akses profil serta data/storage dengan Firebase UID. Callback redirect browser Supabase yang tidak dipakai dihapus dari konfigurasi Android/iOS.
+- **Evaluasi dan batas bukti:**
+  `flutter analyze` tidak menemukan masalah, 3 widget test lulus, dan APK debug berhasil dibangun. Pengujian pemilih akun di perangkat, SHA-1 signing yang benar, aktivasi provider Google Firebase, serta penerapan migration dan Third-Party Auth Supabase belum dibuktikan pada sesi ini.
 
 ## 5. Rencana Target Fitur Menuju Akhir Semester (UAS)
 1. **Integrasi Backend Database Nyata (Supabase & Firebase):** Mengaktifkan modul database real-time cloud menggantikan cache lokal sementara, mengaitkan autentikasi siswa dan guru ke live database.
