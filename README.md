@@ -139,10 +139,13 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
     - Menyelaraskan tata letak header sub-menu dengan modul lainnya (`TugasScreen` & `MateriScreen`), dilengkapi tombol kembali (`arrow_back`), logo resmi UKKMate, judul sub-menu `UKKMATE CBT`, indikator status *Tersinkron*, dan foto profil asesi.
     - Dilengkapi fitur pendukung belajar mandiri: kartu target harian siswa, pemilihan 3 mode latihan (Drill Kilat, Studi Kasus, Uji Waktu), filter chip kategori kompetensi interaktif, daftar paket soal studi kasus terarah, serta kartu tips belajar sukses UKK.
 
-17. **Google Sign-In Native dan Jembatan Firebase–Supabase (v0.2.10):**
-    - Mengalihkan autentikasi email/password dan Google ke Firebase Auth; tombol Google memakai pemilih akun `google_sign_in` di aplikasi.
-    - Menyediakan Firebase ID token untuk Supabase Third-Party Auth dan migration RLS/storage berdasarkan Firebase UID.
-    - APK debug berhasil dibangun, `flutter analyze` bersih, dan 3 widget test lulus. Login native di perangkat serta migration/backend live belum diverifikasi.
+17. **Rangkaian Progres Minggu ke-7 (v0.2.5–v0.2.11):**
+    - **v0.2.5–v0.2.6:** Menyiapkan Firebase lintas platform dan konfigurasi Google Sign-In/OAuth.
+    - **v0.2.7–v0.2.8:** Menambahkan konfigurasi Supabase lalu menghubungkan autentikasi dan data aplikasi ke Supabase.
+    - **v0.2.9:** Mengaudit riwayat kredensial dan memperketat aturan pengabaian berkas lokal/rahasia.
+    - **v0.2.10:** Mengalihkan Google Sign-In ke Firebase Auth native dan menyediakan Firebase ID token untuk Supabase Third-Party Auth/RLS.
+    - **v0.2.11+23:** Mencatat evaluasi kesiapan serta meluruskan status *offline-first* dan chatbot pada dokumentasi.
+    - `flutter analyze` bersih, 3 widget test lulus, dan APK debug berhasil dibangun. Login native di perangkat serta migration/backend live belum diverifikasi.
 
 18. **Catatan Kesiapan Minggu ke-7 (v0.2.11):**
     - Pembaruan ini merapikan catatan proyek dan mengoreksi klaim *offline-first* serta chatbot agar sesuai implementasi saat ini.
