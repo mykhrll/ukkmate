@@ -6,7 +6,7 @@
 **NPM:** 2413025012  
 **Program Studi:** Pendidikan Teknologi Informasi  
 **Judul Aplikasi:** UKKMate: Aplikasi Simulasi dan Bank Soal Uji Kompetensi Keahlian untuk Siswa SMK  
-**Versi Saat Ini:** v0.2.9 (Audit kredensial dan perlindungan file lokal)
+**Versi Saat Ini:** v0.2.10 (Firebase native Google Sign-In dan Supabase third-party auth)
 **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -220,6 +220,13 @@ Pengerjaan dan rilis versi aplikasi UKKMate dibangun secara bertahap dan terenca
 - Menambahkan aturan ignore untuk file environment lokal, direktori `secrets/`, dan signing key.
 - Firebase client API keys dan Supabase publishable key tetap berada dalam konfigurasi aplikasi karena bersifat public-client; key rahasia yang pernah dibagikan harus dirotasi di dashboard penyedia.
 - Sinkronisasi versi aplikasi ke `v0.2.9+21`.
+
+### 📅 Firebase Native Auth (Rilis v0.2.10)
+- Mengganti Google OAuth browser Supabase dengan pemilih akun native `google_sign_in` dan `FirebaseAuth.signInWithCredential`.
+- Memakai Firebase Auth untuk email/password, reset password, Google Sign-In, serta sesi pengguna.
+- Menghubungkan Firebase ID token ke Supabase Third-Party Auth dan menambahkan migration RLS yang membatasi baris serta Storage berdasarkan Firebase project dan UID.
+- Menyinkronkan versi aplikasi dan label UI ke `v0.2.10+22`.
+- Pengujian native login tetap memerlukan Google provider Firebase aktif, SHA-1 Android benar, Supabase Third-Party Auth Firebase aktif, dan perangkat yang menjalankan build terbaru.
 
 ---
 

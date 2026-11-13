@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.9
+> **Versi Aplikasi:** v0.2.10
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -56,7 +56,7 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.9)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.10)
 
 1. **Video Splash Screen Sinematik 3 Detik Penuh (v0.2.0):**
    - Menampilkan berkas video animasi resolusi tinggi `assets/splash-screen.mp4` baru yang telah dipersingkat dan dioptimalkan menjadi tepat 3 detik.
@@ -208,15 +208,18 @@ flutter pub get
 - Untuk Flutter, gunakan paket Firebase di `pubspec.yaml`; jangan menambahkan Firebase iOS SDK secara manual lewat Swift Package Manager.
 - Letakkan `GoogleService-Info.plist` di `ios/Runner/` dan pastikan Bundle ID sama dengan yang didaftarkan di Firebase.
 - Letakkan `google-services.json` di `android/app/`; setelah mengaktifkan Google Sign-In, unduh ulang konfigurasi Android dan iOS dari Firebase Console.
+- Untuk Android native account picker, aktifkan Google provider di **Firebase Authentication**, daftarkan SHA-1 aplikasi Android, lalu unduh `google-services.json` terbaru. Aplikasi memakai `google_sign_in` dan Firebase Auth credential, bukan Supabase browser OAuth.
 - Build dan validasi iOS memerlukan macOS dengan Xcode; konfigurasi Flutter saja belum membuktikan build native berhasil.
 
 ### Konfigurasi Supabase Flutter
 - Simpan Project URL dan publishable key di `BackendConfig`; publishable key memang ditujukan untuk aplikasi client.
-- Jalankan migration `supabase/migrations/202611120001_profile_signup_metadata.sql` melalui **Supabase → SQL Editor** untuk menyimpan NISN/nama signup dan path avatar.
-- Buat bucket private `avatars`, `materials`, dan `assignments`, lalu jalankan policies Storage yang sesuai dengan pola path `<user-uuid>/...`.
+- Jalankan migration `202611120001_profile_signup_metadata.sql` lalu `202611120002_firebase_auth_bridge.sql` dari folder `supabase/migrations/` melalui **Supabase → SQL Editor**.
+- Di **Supabase → Authentication → Third-Party Auth**, tambahkan Firebase dengan Project ID `ukkmate`; Supabase memakai Firebase ID token untuk memeriksa RLS. Jangan gunakan **Authentication → Providers → Google** Supabase untuk tombol Google native aplikasi.
+- Buat bucket private `avatars`, `materials`, dan `assignments`, lalu jalankan policies Storage yang sesuai dengan pola path `<firebase-uid>/...`.
 - Pastikan schema `public` tersedia di Data API dan policy RLS tabel `users`, `materials`, serta `tasks` sudah aktif.
-- Untuk Google OAuth, masukkan Client ID/Secret di **Authentication → Providers → Google**. Callback Google adalah `https://<project-ref>.supabase.co/auth/v1/callback`; tambahkan `https://ukkmate.web.app` dan `io.supabase.ukkmate://login-callback/` ke URL redirect yang diizinkan Supabase.
-- Login email/password menggunakan email; NISN/NIP hanya data profil. Role guru harus ditetapkan oleh admin, bukan pengguna client.
+- Di Firebase Console, aktifkan provider Google dan pastikan SHA-1 dari signing certificate APK sudah terdaftar. Jika Firebase OAuth client dihapus, perbarui konfigurasi Google/Firebase lalu unduh `google-services.json` terbaru sebelum build dan instal ulang APK.
+- Error `deleted_client` dari Supabase Google Provider tidak berlaku untuk flow native Firebase; flow aplikasi tidak memakai redirect OAuth Supabase.
+- Login email/password dan Google dikelola Firebase; NISN/NIP hanya data profil. Role guru harus ditetapkan oleh admin, bukan pengguna client.
 - Sesi CBT baru mencatat mulai/keluar; tabel `exam_results` dan perhitungan nilai tepercaya belum terhubung. Akses guru/admin lintas kelas juga menunggu tabel relasi kelas dan policy khusus.
 - Integrasi sekarang dikumpulkan di `BackendConfig`; pemisahan ke `auth_service.dart`, `supabase_service.dart`, dan `firebase_service.dart` masih menjadi perapian arsitektur berikutnya.
 - Aktifkan Row Level Security (RLS) dan buat policy sebelum tabel diakses dari aplikasi.

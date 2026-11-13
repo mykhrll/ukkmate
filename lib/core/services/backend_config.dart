@@ -1,4 +1,7 @@
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
+
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ukkmate/core/constants/app_version.dart';
 
@@ -11,14 +14,18 @@ class BackendConfig {
   BackendConfig._internal();
 
   static bool _initialized = false;
+  static final firebase_auth.FirebaseAuth _firebaseAuth =
+      firebase_auth.FirebaseAuth.instance;
+  static final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
   bool get isInitialized => _initialized;
   SupabaseClient get client => Supabase.instance.client;
-  User? get currentUser => _initialized ? client.auth.currentUser : null;
-  Stream<AuthState> get authStateChanges => client.auth.onAuthStateChange;
+  firebase_auth.User? get currentUser => _firebaseAuth.currentUser;
+  Stream<firebase_auth.User?> get authStateChanges =>
+      _firebaseAuth.authStateChanges();
 
   /// Configured backend providers
-  final String primaryBackend = 'Supabase Database & Auth';
+  final String primaryBackend = 'Firebase Auth & Supabase Database';
   final String secondaryBackend = 'Firebase Cloud Messaging & Analytics';
 
   /// Supabase client configuration. Keep RLS enabled for exposed tables.
@@ -34,22 +41,53 @@ class BackendConfig {
     await Supabase.initialize(
       url: supabaseUrl,
       publishableKey: supabasePublishableKey,
+      accessToken: () async {
+        final user = _firebaseAuth.currentUser;
+        return user == null ? null : await user.getIdToken();
+      },
     );
     _initialized = true;
   }
 
-  Future<Map<String, dynamic>?> getCurrentProfile() async {
+  Future<Map<String, dynamic>?> getCurrentProfile({
+    String? nisn,
+    String? nama,
+  }) async {
     final user = currentUser;
     if (user == null) return null;
 
-    final profile = await client
+    final existingProfile = await client
         .from('users')
         .select()
-        .eq('id', user.id)
+        .eq('firebase_uid', user.uid)
         .maybeSingle();
-    final avatarPath = profile?['avatar_path'] as String?;
+    late Map<String, dynamic> profile;
+    if (existingProfile == null) {
+      profile = await client
+          .from('users')
+          .insert({
+            'firebase_uid': user.uid,
+            'email': user.email,
+            'nama': nama ?? user.displayName ?? '',
+            if (nisn != null) 'nisn': nisn,
+          })
+          .select()
+          .single();
+    } else {
+      final updates = <String, dynamic>{};
+      profile = Map<String, dynamic>.from(existingProfile);
+      if (user.email != null && profile['email'] != user.email) {
+        updates['email'] = user.email;
+      }
+      if (nama != null && profile['nama'] != nama) updates['nama'] = nama;
+      if (updates.isNotEmpty) {
+        await client.from('users').update(updates).eq('id', profile['id']);
+        profile = {...profile, ...updates};
+      }
+    }
+    final avatarPath = profile['avatar_path'] as String?;
     if (avatarPath != null) {
-      profile!['avatar_url'] = await client.storage
+      profile['avatar_url'] = await client.storage
           .from('avatars')
           .createSignedUrl(avatarPath, 300);
     }
@@ -60,11 +98,14 @@ class BackendConfig {
     required String email,
     required String password,
   }) async {
-    await client.auth.signInWithPassword(email: email, password: password);
+    await _firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
     final profile = await getCurrentProfile();
     if (profile == null) {
       throw StateError(
-        'Profil akun belum tersedia. Jalankan migration signup Supabase.',
+        'Profil belum tersedia. Periksa migration Firebase Auth bridge dan Third-Party Auth Supabase.',
       );
     }
     return profile['role'] as String? ?? 'siswa';
@@ -84,35 +125,51 @@ class BackendConfig {
       throw ArgumentError('Kata sandi minimal 8 karakter.');
     }
 
-    final response = await client.auth.signUp(
+    final response = await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
-      data: {'nisn': nisn, 'nama': nama},
     );
-    return response.session != null;
+    await response.user?.updateDisplayName(nama);
+    await getCurrentProfile(nisn: nisn, nama: nama);
+    return response.user != null;
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
-    await client.auth.resetPasswordForEmail(email, redirectTo: _redirectUrl);
+    await _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
-  Future<bool> signInWithGoogle() {
-    return client.auth.signInWithOAuth(
-      OAuthProvider.google,
-      redirectTo: _redirectUrl,
+  Future<String?> signInWithGoogle() async {
+    await _googleSignIn.signOut();
+    final account = await _googleSignIn.signIn();
+    if (account == null) return null;
+
+    final googleAuthentication = await account.authentication;
+    final idToken = googleAuthentication.idToken;
+    if (idToken == null) {
+      throw StateError('Google tidak mengembalikan ID token.');
+    }
+    final credential = firebase_auth.GoogleAuthProvider.credential(
+      idToken: idToken,
+      accessToken: googleAuthentication.accessToken,
     );
+    await _firebaseAuth.signInWithCredential(credential);
+    final profile = await getCurrentProfile(nama: account.displayName);
+    return profile?['role'] as String? ?? 'siswa';
   }
 
-  Future<void> signOut() => client.auth.signOut();
+  Future<void> signOut() async {
+    await _firebaseAuth.signOut();
+    await _googleSignIn.signOut();
+  }
 
   Future<String> startExamSession() async {
-    final user = currentUser;
-    if (user == null) {
+    final profile = await getCurrentProfile();
+    if (profile == null) {
       throw StateError('Silakan masuk untuk memulai sesi ujian.');
     }
     final row = await client
         .from('exam_sessions')
-        .insert({'user_id': user.id})
+        .insert({'user_id': profile['id']})
         .select('id')
         .single();
     return row['id'] as String;
@@ -122,8 +179,8 @@ class BackendConfig {
     required String sessionId,
     required String status,
   }) async {
-    final user = currentUser;
-    if (user == null) throw StateError('Sesi akun tidak aktif.');
+    final profile = await getCurrentProfile();
+    if (profile == null) throw StateError('Sesi akun tidak aktif.');
     if (!{'completed', 'abandoned'}.contains(status)) {
       throw ArgumentError.value(status, 'status', 'Status sesi tidak valid.');
     }
@@ -134,14 +191,16 @@ class BackendConfig {
           'status': status,
         })
         .eq('id', sessionId)
-        .eq('user_id', user.id);
+        .eq('user_id', profile['id']);
   }
 
   Future<void> updatePassword(String password) async {
     if (password.length < 8) {
       throw ArgumentError('Kata sandi minimal 8 karakter.');
     }
-    await client.auth.updateUser(UserAttributes(password: password));
+    final user = currentUser;
+    if (user == null) throw StateError('Sesi Firebase tidak aktif.');
+    await user.updatePassword(password);
   }
 
   Future<List<Map<String, dynamic>>> fetchMaterials() async {
@@ -153,13 +212,13 @@ class BackendConfig {
   }
 
   Future<List<Map<String, dynamic>>> fetchTasks() async {
-    final user = currentUser;
-    if (user == null) throw StateError('Silakan masuk untuk melihat tugas.');
+    final profile = await getCurrentProfile();
+    if (profile == null) throw StateError('Silakan masuk untuk melihat tugas.');
 
     final rows = await client
         .from('tasks')
         .select()
-        .eq('user_id', user.id)
+        .eq('user_id', profile['id'])
         .order('due_date');
     return List<Map<String, dynamic>>.from(rows);
   }
@@ -168,8 +227,8 @@ class BackendConfig {
     required String taskId,
     required String status,
   }) async {
-    final user = currentUser;
-    if (user == null) {
+    final profile = await getCurrentProfile();
+    if (profile == null) {
       throw StateError('Silakan masuk untuk memperbarui tugas.');
     }
     if (!{'pending', 'in_progress', 'completed'}.contains(status)) {
@@ -180,7 +239,7 @@ class BackendConfig {
         .from('tasks')
         .update({'status': status})
         .eq('id', taskId)
-        .eq('user_id', user.id);
+        .eq('user_id', profile['id']);
   }
 
   Future<String> uploadAvatar({
@@ -188,8 +247,8 @@ class BackendConfig {
     required String extension,
     required String contentType,
   }) async {
-    final user = currentUser;
-    if (user == null) {
+    final profile = await getCurrentProfile();
+    if (profile == null) {
       throw StateError('Silakan masuk untuk mengunggah avatar.');
     }
     final normalizedExtension = extension.toLowerCase().replaceFirst('.', '');
@@ -201,7 +260,8 @@ class BackendConfig {
       );
     }
 
-    final path = '${user.id}/avatar.$normalizedExtension';
+    final firebaseUid = currentUser!.uid;
+    final path = '$firebaseUid/avatar.$normalizedExtension';
     await client.storage
         .from('avatars')
         .uploadBinary(
@@ -209,7 +269,10 @@ class BackendConfig {
           bytes,
           fileOptions: FileOptions(upsert: true, contentType: contentType),
         );
-    await client.from('users').update({'avatar_path': path}).eq('id', user.id);
+    await client
+        .from('users')
+        .update({'avatar_path': path})
+        .eq('id', profile['id']);
     return path;
   }
 
@@ -219,10 +282,13 @@ class BackendConfig {
     required Uint8List bytes,
     required String contentType,
   }) async {
-    final user = currentUser;
-    if (user == null) throw StateError('Silakan masuk untuk mengunggah tugas.');
+    final profile = await getCurrentProfile();
+    if (profile == null) {
+      throw StateError('Silakan masuk untuk mengunggah tugas.');
+    }
     final safeFileName = fileName.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
-    final path = '${user.id}/$taskId/$safeFileName';
+    final firebaseUid = currentUser!.uid;
+    final path = '$firebaseUid/$taskId/$safeFileName';
     await client.storage
         .from('assignments')
         .uploadBinary(
@@ -234,7 +300,7 @@ class BackendConfig {
         .from('tasks')
         .update({'submission_path': path})
         .eq('id', taskId)
-        .eq('user_id', user.id);
+        .eq('user_id', profile['id']);
     return path;
   }
 
@@ -250,10 +316,7 @@ class BackendConfig {
 
   String get connectionStatusText {
     return _initialized
-        ? 'Supabase siap • ${AppVersion.name}'
+        ? 'Firebase Auth + Supabase • ${AppVersion.name}'
         : 'Supabase belum diinisialisasi';
   }
-
-  String get _redirectUrl =>
-      kIsWeb ? Uri.base.origin : 'io.supabase.ukkmate://login-callback/';
 }

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 import 'package:ukkmate/core/theme/app_colors.dart';
 import 'package:ukkmate/core/theme/app_text_styles.dart';
 import 'package:ukkmate/core/services/backend_config.dart';
@@ -25,7 +24,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isSubmitting = false;
   bool _waitingForOAuth = false;
   bool _didNavigate = false;
-  bool _isPasswordRecovery = false;
   StreamSubscription? _authSubscription;
 
   final TextEditingController _nisnController = TextEditingController();
@@ -45,17 +43,9 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _isLogin = widget.initialIsLogin;
     if (BackendConfig().isInitialized) {
-      _authSubscription = BackendConfig().authStateChanges.listen((state) {
-        if (state.event == AuthChangeEvent.initialSession &&
-            state.session != null) {
+      _authSubscription = BackendConfig().authStateChanges.listen((user) {
+        if (user != null && !_isSubmitting && !_waitingForOAuth) {
           unawaited(_openForCurrentUser());
-        } else if (_waitingForOAuth &&
-            state.event == AuthChangeEvent.signedIn) {
-          _waitingForOAuth = false;
-          unawaited(_openForCurrentUser());
-        } else if (state.event == AuthChangeEvent.passwordRecovery) {
-          _isPasswordRecovery = true;
-          _showPasswordRecoveryDialog();
         }
       });
     }
@@ -85,14 +75,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _openForCurrentUser({String? role}) async {
-    if (_didNavigate || _isPasswordRecovery || !mounted) return;
+    if (_didNavigate || !mounted) return;
     try {
       final profile = await BackendConfig().getCurrentProfile();
       if (!mounted) return;
       final currentRole = role ?? profile?['role'] as String?;
       if (currentRole == null) {
         _showAuthMessage(
-          'Profil akun belum tersedia. Jalankan migration Supabase.',
+          'Profil belum tersedia. Jalankan migration Firebase Auth bridge dan aktifkan Third-Party Auth di Supabase.',
         );
         return;
       }
@@ -108,67 +98,6 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (error) {
       _showAuthMessage('Gagal memuat profil akun: $error');
     }
-  }
-
-  void _showPasswordRecoveryDialog() {
-    final passwordController = TextEditingController();
-    final confirmController = TextEditingController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogContext) => AlertDialog(
-          title: const Text('Buat kata sandi baru'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Kata sandi baru'),
-              ),
-              TextField(
-                controller: confirmController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Ulangi kata sandi',
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Nanti'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (passwordController.text != confirmController.text) {
-                  _showAuthMessage('Konfirmasi kata sandi tidak cocok.');
-                  return;
-                }
-                try {
-                  await BackendConfig().updatePassword(passwordController.text);
-                  if (!dialogContext.mounted) return;
-                  Navigator.pop(dialogContext);
-                  _showAuthMessage(
-                    'Kata sandi berhasil diperbarui.',
-                    isError: false,
-                  );
-                } catch (error) {
-                  _showAuthMessage('Gagal memperbarui kata sandi: $error');
-                }
-              },
-              child: const Text('Simpan'),
-            ),
-          ],
-        ),
-      ).whenComplete(() {
-        passwordController.dispose();
-        confirmController.dispose();
-      });
-    });
   }
 
   Future<void> _handleLogin() async {
@@ -954,10 +883,12 @@ class _LoginScreenState extends State<LoginScreen> {
       _waitingForOAuth = true;
     });
     try {
-      final launched = await BackendConfig().signInWithGoogle();
-      if (!launched) {
-        _waitingForOAuth = false;
-        _showAuthMessage('Proses Google Sign-In tidak dapat dimulai.');
+      final role = await BackendConfig().signInWithGoogle();
+      _waitingForOAuth = false;
+      if (role == null) {
+        _showAuthMessage('Pemilihan akun Google dibatalkan.', isError: false);
+      } else {
+        await _openForCurrentUser(role: role);
       }
     } catch (error) {
       _waitingForOAuth = false;
