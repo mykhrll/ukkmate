@@ -8,7 +8,7 @@
 > **Nama:** Muhamad Khoirul Ramadhan  
 > **NPM:** 2413025012  
 > **Program Studi:** Pendidikan Teknologi Informasi  
-> **Versi Aplikasi:** v0.2.11+23
+> **Versi Aplikasi:** v0.2.12+24
 > **Tautan Repositori:** https://github.com/mykhrll/ukkmate  
 
 ---
@@ -56,7 +56,7 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 
 ---
 
-## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.11)
+## 🚀 Fitur Utama (Pembaruan v0.1.5 s/d v0.2.12)
 
 1. **Video Splash Screen Sinematik 3 Detik Penuh (v0.2.0):**
    - Menampilkan berkas video animasi resolusi tinggi `assets/splash-screen.mp4` baru yang telah dipersingkat dan dioptimalkan menjadi tepat 3 detik.
@@ -150,6 +150,11 @@ Berikut adalah dokumentasi tangkapan layar antarmuka pengguna (*user interface*)
 18. **Catatan Kesiapan Minggu ke-7 (v0.2.11):**
     - Pembaruan ini merapikan catatan proyek dan mengoreksi klaim *offline-first* serta chatbot agar sesuai implementasi saat ini.
     - Perhitungan hasil ujian, otorisasi guru lintas kelas, cache offline persisten, dan chatbot LLM tetap menjadi pekerjaan lanjutan.
+
+19. **Perbaikan Jalur Daftar dan Login (v0.2.12):**
+    - Mendaftarkan SHA-1 debug Android yang cocok ke Firebase dan menyegarkan `google-services.json` agar Google Sign-In tidak lagi memakai fingerprint lama.
+    - Menerapkan migration profil dan Firebase Auth bridge pada proyek Supabase yang dipakai aplikasi.
+    - Memperjelas pesan saat Firebase menerima akun tetapi Supabase menolak token/profil. Integrasi Firebase Third-Party Auth pada Dashboard Supabase tetap harus aktif agar akses data berhasil.
 
 ---
 

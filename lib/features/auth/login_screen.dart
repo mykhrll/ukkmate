@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show PostgrestException;
 import 'package:ukkmate/core/theme/app_colors.dart';
 import 'package:ukkmate/core/theme/app_text_styles.dart';
 import 'package:ukkmate/core/services/backend_config.dart';
@@ -74,6 +77,50 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  String _authErrorMessage(Object error, {required String action}) {
+    if (error is PostgrestException &&
+        (error.code == 'PGRST301' ||
+            error.message.toLowerCase().contains('no suitable key'))) {
+      if (action == 'daftar') {
+        return 'Akun Firebase sudah dibuat, tetapi profil UKKMate belum tersimpan. '
+            'Aktifkan Firebase Third-Party Auth pada proyek Supabase “ukkmate”, '
+            'lalu masuk dengan email ini.';
+      }
+      return 'Firebase berhasil memeriksa akun, tetapi Supabase belum menerima '
+          'token Firebase. Aktifkan Firebase Third-Party Auth pada proyek '
+          'Supabase “ukkmate”.';
+    }
+
+    if (error is firebase_auth.FirebaseAuthException) {
+      return switch (error.code) {
+        'email-already-in-use' => 'Email ini sudah terdaftar. Silakan masuk atau gunakan Lupa Kata Sandi.',
+        'invalid-email' => 'Format email tidak valid.',
+        'invalid-credential' ||
+        'wrong-password' ||
+        'user-not-found' => 'Email atau kata sandi salah.',
+        'weak-password' =>
+          'Kata sandi terlalu lemah. Gunakan minimal 8 karakter.',
+        'network-request-failed' =>
+          'Koneksi internet bermasalah. Periksa jaringan lalu coba lagi.',
+        'operation-not-allowed' =>
+          'Metode masuk ini belum diaktifkan pada Firebase Authentication.',
+        _ =>
+          'Firebase gagal memproses $action (${error.code}). Coba lagi atau '
+              'hubungi pengelola aplikasi.',
+      };
+    }
+
+    if (error is PlatformException &&
+        (error.message?.contains('10') ?? false)) {
+      return 'Google menolak konfigurasi aplikasi. SHA-1 debug sudah diperbarui; '
+          'pasang APK terbaru. Jika tetap gagal, pastikan provider Google aktif '
+          'di Firebase Authentication.';
+    }
+
+    return 'Gagal $action. Periksa koneksi dan konfigurasi Firebase/Supabase, '
+        'lalu coba lagi.';
+  }
+
   Future<void> _openForCurrentUser({String? role}) async {
     if (_didNavigate || !mounted) return;
     try {
@@ -96,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
         (route) => false,
       );
     } catch (error) {
-      _showAuthMessage('Gagal memuat profil akun: $error');
+      _showAuthMessage(_authErrorMessage(error, action: 'memuat profil akun'));
     }
   }
 
@@ -122,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       await _openForCurrentUser(role: role);
     } catch (error) {
-      _showAuthMessage('Tidak dapat masuk: $error');
+      _showAuthMessage(_authErrorMessage(error, action: 'masuk'));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -173,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (error) {
-      _showAuthMessage('Pendaftaran gagal: $error');
+      _showAuthMessage(_authErrorMessage(error, action: 'daftar'));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -892,7 +939,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (error) {
       _waitingForOAuth = false;
-      _showAuthMessage('Google Sign-In gagal: $error');
+      _showAuthMessage(_authErrorMessage(error, action: 'Google Sign-In'));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }

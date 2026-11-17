@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "318721086619-4b949d9oqbb1pj3qtomeonnh6fms7lak.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ukkmate",
+            "certificate_hash": "1bb47d29713a3d39dad74ef3436e893b4b4d547d"
+          }
+        },
+        {
           "client_id": "318721086619-8fcs1queafefgi246kr6be0sdjcb7tfi.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
